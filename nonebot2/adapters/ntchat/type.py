@@ -72,6 +72,10 @@ class EventType(IntEnum):
     """接收其他未知消息"""
     MT_RECV_OTHER_APP_MSG = 11061
     """接收应用类型未知消息"""
+    MT_ROOM_ADD_MEMBER_NOTIFY_MSG = 11098
+    """群员新增通知"""
+    MT_ROOM_DEL_MEMBER_NOTIFY_MSG = 11099
+    """群员删除通知"""
 
 
 class WxType(IntEnum):
