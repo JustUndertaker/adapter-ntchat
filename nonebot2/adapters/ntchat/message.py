@@ -38,22 +38,31 @@ class MessageSegment(BaseMessageSegment["Message"]):
 
     @overrides(BaseMessageSegment)
     def is_text(self) -> bool:
-        return self.type == "text"
+        return self.type == "text" or self.type == "atmsg"
 
     @staticmethod
-    def at(wx_id: str) -> "TextSegment":
-        """at某人"""
-        return TextSegment("text", at_list=[wx_id], data={"text": "{$@}"})
+    def chatroom_atmsg(content: str, at_list: List[str]) -> "MessageSegment":
+        """
+        说明:
+            - 群里发送@消息，文本消息的content的内容中设置占位字符串 {$@},
+            - 这些字符的位置就是最终的@符号所在的位置，假设这两个被@的微信号的群昵称分别为aa,bb:
+            - 则实际发送的内容为 "test,你好@ aa,你好@ bb.早上好"(占位符被替换了)
+
+        参数:
+            * `content`:文字内容
+            * `at_list`：at列表
+        """
+        return MessageSegment("atmsg", data={"content": content, "at_list": at_list})
 
     @staticmethod
-    def text(text: str) -> "TextSegment":
+    def text(content: str) -> "MessageSegment":
         """文字消息"""
-        return TextSegment("text", data={"text": text})
+        return MessageSegment("text", data={"content": content})
 
     @staticmethod
-    def card(wx_id: str) -> "MessageSegment":
+    def card(card_wxid: str) -> "MessageSegment":
         """名片消息"""
-        return MessageSegment("card", {"card_wxid": wx_id})
+        return MessageSegment("card", {"card_wxid": card_wxid})
 
     @staticmethod
     def link(title: str, desc: str, url: str, image_url: str) -> "MessageSegment":
@@ -99,32 +108,10 @@ class MessageSegment(BaseMessageSegment["Message"]):
             file = Path(file)
         return MessageSegment("file", {"file": file})
 
-
-class TextSegment(MessageSegment):
-    """文字消息段"""
-
-    at_list: List[str] = []
-    """at列表"""
-
-    def __add__(self, other: Union[str, "TextSegment"]) -> "TextSegment":
-        if isinstance(other, str):
-            self.data["text"] += other
-            return self
-        if isinstance(other, TextSegment):
-            if other.at_list:
-                self.at_list += other.at_list
-            self.data["text"] += other.data["text"]
-            return self
-
-    def __radd__(self, other: Union[str, "TextSegment"]) -> "TextSegment":
-        if isinstance(other, str):
-            self.data["text"] += other
-            return self
-        if isinstance(other, TextSegment):
-            if other.at_list:
-                self.at_list += other.at_list
-            self.data["text"] += other.data["text"]
-            return self
+    @staticmethod
+    def xml(xml: str, app_type: int = 5) -> "MessageSegment":
+        """xml消息"""
+        return MessageSegment("xml", {"xml": xml, "app_type": app_type})
 
 
 class Message(BaseMessage[MessageSegment]):

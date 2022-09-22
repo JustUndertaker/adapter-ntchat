@@ -6,7 +6,7 @@ from nonebot.message import handle_event
 from nonebot.typing import overrides
 
 from .event import Event, TextMessageEvent
-from .message import Message
+from .message import MessageSegment
 from .utils import log
 
 
@@ -48,28 +48,17 @@ def _check_nickname(bot: "Bot", event: TextMessageEvent) -> None:
 async def send(
     bot: "Bot",
     event: Event,
-    message: Union[str, Message],
+    message: Union[str, MessageSegment],
     **params: Any,  # extra options passed to send_msg API
 ) -> Any:
     """默认回复消息处理函数。"""
-    event_dict = event.dict()
+    if isinstance(message, str):
+        message = MessageSegment.text(message)
 
-    if "wx_id" in event_dict:
-        params.setdefault("wx_id", event_dict["wx_id"])
+    api = f"send_{message.type}"
+    message.data["to_wxid"] = event.from_wxid
 
-    if "room_id" in event_dict:
-        params.setdefault("room_id", event_dict["room_id"])
-
-    if "message_type" not in params:  # guess the message_type
-        if "room_id" in params:
-            params["message_type"] = "group"
-        elif "wx_id" in params:
-            params["message_type"] = "private"
-        else:
-            raise ValueError("Cannot guess message type to reply!")
-    params.setdefault("message", message)
-
-    return await bot.send_text(**params)
+    return await bot.call_api(api, **message.data)
 
 
 class Bot(BaseBot):
@@ -77,7 +66,7 @@ class Bot(BaseBot):
     ntchat协议适配。
     """
 
-    send_handler: Callable[["Bot", Event, Union[str, Message]], Any] = send
+    send_handler: Callable[["Bot", Event, Union[str, MessageSegment]], Any] = send
 
     async def handle_event(self, event: Event) -> None:
         """处理收到的事件。"""
@@ -91,7 +80,7 @@ class Bot(BaseBot):
     async def send(
         self,
         event: Event,
-        message: Union[str, Message],
+        message: Union[str, MessageSegment],
         **kwargs: Any,
     ) -> Any:
         """根据 `event` 向触发事件的主体回复消息。
@@ -99,15 +88,12 @@ class Bot(BaseBot):
         参数:
             event: Event 对象
             message: 要发送的消息
-            at_sender (bool): 是否 @ 事件主体
-            reply_message (bool): 是否回复事件消息
             kwargs: 其他参数
 
         返回:
             API 调用返回数据
 
         异常:
-            ValueError: 缺少 `user_id`, `group_id`
             NetworkError: 网络错误
             ActionFailed: API 调用失败
         """
