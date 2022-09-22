@@ -6,6 +6,7 @@ import contextlib
 import json
 from typing import Any, Dict, List, Optional, cast
 
+from nonebot.adapters import Adapter as BaseAdapter
 from nonebot.drivers.fastapi import Driver
 from nonebot.exception import WebSocketClosed
 from nonebot.internal.driver import (
@@ -17,8 +18,6 @@ from nonebot.internal.driver import (
 )
 from nonebot.typing import overrides
 from nonebot.utils import DataclassEncoder, escape_tag
-
-from nonebot.adapters import Adapter as BaseAdapter
 
 from .bot import Bot
 from .config import Config

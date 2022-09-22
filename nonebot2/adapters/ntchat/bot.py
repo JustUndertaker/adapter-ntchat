@@ -1,10 +1,9 @@
 import re
 from typing import Any, Callable, Union
 
+from nonebot.adapters import Bot as BaseBot
 from nonebot.message import handle_event
 from nonebot.typing import overrides
-
-from nonebot.adapters import Bot as BaseBot
 
 from .event import Event, TextMessageEvent
 from .message import Message
@@ -70,7 +69,7 @@ async def send(
             raise ValueError("Cannot guess message type to reply!")
     params.setdefault("message", message)
 
-    return await bot.send_msg(**params)
+    return await bot.send_text(**params)
 
 
 class Bot(BaseBot):

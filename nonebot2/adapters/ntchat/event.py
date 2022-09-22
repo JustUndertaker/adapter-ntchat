@@ -66,10 +66,10 @@ class Event(BaseEvent):
     def get_event_name(self) -> str:
         try:
             wx_type = WxType(self.wx_type)
-            return f"Message.{wx_type.name}"
+            return f"{wx_type.name}"
         except Exception:
             wx_type = self.wx_type
-            return f"Message.{wx_type}"
+            return f"{wx_type}"
 
     @overrides(BaseEvent)
     def get_message(self) -> "Message":
@@ -140,9 +140,11 @@ class PictureMessageEvent(Event):
     @overrides(Event)
     def get_event_description(self) -> str:
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.image)}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return (
+                f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.image)}"
+            )
 
 
 @EventRister.rister(EventType.MT_RECV_VOICE_MSG)
