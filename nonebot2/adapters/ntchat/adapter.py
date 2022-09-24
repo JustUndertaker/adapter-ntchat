@@ -69,6 +69,7 @@ class Adapter(BaseAdapter):
             json_data = json.dumps(
                 {"action": api, "params": data, "echo": str(seq)},
                 cls=DataclassEncoder,
+                ensure_ascii=False,
             )
             await websocket.send(json_data)
             return handle_api_result(
