@@ -1,6 +1,6 @@
 import nonebot
 
-from nonebot2.adapters.ntchat.adapter import Adapter
+from nonebot2.adapters.ntchat import Adapter
 
 nonebot.init()
 driver = nonebot.get_driver()
