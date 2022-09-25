@@ -14,6 +14,8 @@ class Config(BaseModel):
 
     access_token: Optional[str] = Field(default=None)
     """令牌口令"""
+    chache_path: Optional[str] = "./image_cache"
+    """图片缓存文件夹"""
 
     class Config:
         extra = "ignore"
