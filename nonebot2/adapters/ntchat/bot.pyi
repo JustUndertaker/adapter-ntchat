@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Dict, List, Union
 
 from nonebot.adapters import Bot as BaseBot
@@ -182,14 +183,14 @@ class Bot(BaseBot):
             * `image_url`：图片地址
         """
         ...
-    async def send_image(self, *, to_wxid: str, file_path: str):
+    async def send_image(self, to_wxid: str, file: Union[str, Path, bytes]):
         """
         说明:
-            发送图片
+            发送图片接口，对原有接口进行封装，方便发送
 
         参数:
-            * `to_wxid`：接收人id
-            * `file_path`：图片路径，绝对路径
+            * `to_wxid`：接收方的wx_id，可以是好友id，也可以是room_id
+            * `file`：图片文件，支持url，本地路径，bytes
         """
         ...
     async def send_file(self, *, to_wxid: str, file_path: str):
