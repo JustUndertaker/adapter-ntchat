@@ -54,10 +54,10 @@ class ImageCache:
             }
         )
 
-    def get_seq(self) -> int:
+    def get_seq(self) -> str:
         s = self._seq
         self._seq = (self._seq + 1) % sys.maxsize
-        return s
+        return f"{str(s)}.image"
 
     @run_sync
     def _save(self, image: bytes, path: Path):
@@ -65,7 +65,7 @@ class ImageCache:
         with open(path, mode="wb") as f:
             f.write(image)
 
-    async def get(self, url: URL) -> bytes:
+    async def get(self, url: str) -> bytes:
         """请求获取图片"""
         res = await self._client.get(url)
         return res.content
