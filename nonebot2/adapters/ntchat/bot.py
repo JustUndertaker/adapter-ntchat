@@ -117,13 +117,13 @@ class Bot(BaseBot):
         if isinstance(file, str):
             url = URL(file)
             if url.scheme == "http" or url.scheme == "https":
-                cache_path = self.config["image_cache"]
+                cache_path = Path(self.config.chache_path)
                 image = await image_cache.get(url)
                 file = await image_cache.save_image(cache_path, image)
             else:
                 file = Path(file)
         elif isinstance(file, bytes):
-            cache_path = self.config["image_cache"]
+            cache_path = Path(self.config.chache_path)
             file = await image_cache.save_image(cache_path, file)
 
         await self.call_api("send_image", to_wxid=to_wxid, file_path=file.absolute())
