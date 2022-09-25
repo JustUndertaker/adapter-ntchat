@@ -52,8 +52,7 @@ class Adapter(BaseAdapter):
             URL("/ntchat/ws/"), self.get_name(), self._handle_ws
         )
         path = Path(self.ntchat_config.chache_path)
-        if not path.exists():
-            path.mkdir()
+        path.mkdir(parents=True, exist_ok=True)
         self.setup_websocket_server(ws_setup)
 
     @classmethod
