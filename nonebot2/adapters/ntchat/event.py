@@ -1,8 +1,10 @@
-from typing import Dict, List, Type
+from copy import deepcopy
+from typing import Any, Dict, List, Type
 
 from nonebot.adapters import Event as BaseEvent
 from nonebot.typing import overrides
 from nonebot.utils import escape_tag
+from pydantic import root_validator
 
 from .message import Message
 from .type import EventType, SubType, WxType
@@ -102,7 +104,9 @@ class TextMessageEvent(Event):
     at_user_list: List[str]
     """在群里@的wxid列表"""
     msg: str
-    """消息内容"""
+    """消息文本内容"""
+    message: Message
+    """消息message对象"""
     to_me: bool = False
     """
     :说明: 消息是否与机器人有关
@@ -110,13 +114,19 @@ class TextMessageEvent(Event):
     :类型: ``bool``
     """
 
+    @root_validator(pre=True, allow_reuse=True)
+    def check_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        if "msg" in values:
+            values["message"] = deepcopy(values["msg"])
+        return values
+
     @overrides(BaseEvent)
     def get_type(self) -> str:
         return "message"
 
     @overrides(BaseEvent)
     def get_message(self) -> "Message":
-        return Message(self.msg)
+        return self.message
 
     @overrides(Event)
     def get_event_description(self) -> str:
