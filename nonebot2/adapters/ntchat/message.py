@@ -20,7 +20,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
         data = self.data.copy()
         if type_ == "text":
             # 用于command检验
-            return data.get("text", "")
+            return data.get("content", "")
         return f"[{type_}]: {data}"
 
     @overrides(BaseMessageSegment)
