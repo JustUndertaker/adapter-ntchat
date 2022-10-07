@@ -62,7 +62,11 @@ async def send(
         message = MessageSegment.text(message)
 
     api = f"send_{message.type}"
-    message.data["to_wxid"] = event.from_wxid
+    room_id = event.room_wxid
+    if room_id == "":
+        message.data["to_wxid"] = event.from_wxid
+    else:
+        message.data["to_wxid"] = room_id
 
     return await bot.call_api(api, **message.data)
 
