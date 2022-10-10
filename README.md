@@ -9,6 +9,22 @@
 
 nonebot2的ntchat适配器，配合 [ntchat-client](https://github.com/JustUndertaker/ntchat-client) 可以实现与微信对接。
 
+## 安装方式
+
+### 使用包管理安装（推荐）
+
+```bash
+pip install nonebot-adapter-ntchat
+```
+
+### 使用源码（不推荐）
+
+```bash	
+git clone https://github.com/JustUndertaker/adapter-ntchat.git
+```
+
+将目录复制到`site-packages`下
+
 ## 已实现连接方式
 
 - [x] 反向ws
