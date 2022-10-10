@@ -95,7 +95,7 @@ async def clean_cache():
 from nonebot.plugin import on
 from nonebot.adapter.ntchat import PictureMessageEvent
 
-mather = on("WX_MSG_PICTURE") # rule,permission等参数同样可以加入
+matcher = on("WX_MSG_PICTURE") # rule,permission等参数同样可以加入
 
 @matcher.handle()
 async def _(event:PictureMessageEvent):
