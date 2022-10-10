@@ -52,6 +52,14 @@ async def clean_cache():
 
 这样每天0点就会自动清理图片缓存了
 
+## 注意事项
+
+由于微信不支持连续不同类型消息发出（比如图文消息，发出来会变成2条），所以nonebot2的Message没有具体实现，所需要注意的点如下：
+
+- matcher的默认发送只支持一段消息，因此mather.send，matcher.finish等函数附带的消息只能是str，或者MessageSegment，不能是Message
+- 可以构造MessageSegment来使用matcher.send等其他函数
+- 或者使用bot.call_api来发送消息，具体参数都在提示中有写
+
 ## 已实现事件
 
 ### 普通事件
