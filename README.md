@@ -87,7 +87,7 @@ async def clean_cache():
 from nonebot.plugin import on
 from nonebot.adapter.ntchat import PictureMessageEvent
 
-mather = on("WX_MSG_PICTURE") # rule,permision等参数同样可以加入
+mather = on("WX_MSG_PICTURE") # rule,permission等参数同样可以加入
 
 @matcher.handle()
 async def _(event:PictureMessageEvent):
@@ -95,6 +95,13 @@ async def _(event:PictureMessageEvent):
 ```
 
 上述例子会监听所有的图片消息事件。
+
+### Permission
+
+内置2个Permission，为：
+
+- **PRIVATE**：匹配任意私聊消息类型事件
+- **GROUP**：匹配任意群聊消息类型事件
 
 ## 已实现api
 
