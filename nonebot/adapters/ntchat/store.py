@@ -8,7 +8,6 @@ from typing import Any, Dict, Optional, Tuple
 
 from httpx import AsyncClient
 from nonebot.utils import run_sync
-from yarl import URL
 
 from .exception import NetworkError
 

@@ -13,7 +13,7 @@ from .type import EventType, SubType, WxType
 class EventRister:
     """事件注册器"""
 
-    event_dict: dict[int, Type["Event"]] = {}
+    event_dict: Dict[int, Type["Event"]] = {}
     """事件映射字典"""
 
     @classmethod
