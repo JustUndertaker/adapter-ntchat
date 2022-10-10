@@ -58,7 +58,7 @@ async def clean_cache():
 
 - **TextMessageEvent**：文本消息，事件`type`为："message"，可用于触发on_message等
 - **FriendRquestEvent**：好友请求消息，事件`type`为："request"，可触发on_request
-- **RevokeMessageEvent**：撤回消息通知，事件`type`为："WX_MSG_REVOKE"，可触发on_notice
+- **RevokeMessageEvent**：撤回消息通知，事件`type`为："notice"，可触发on_notice
 
 - **PictureMessageEvent**：图片消息，事件`type`为："WX_MSG_PICTURE"
 - **VoiceMessageEvent**：语音消息，事件`type`为："WX_MSG_VOICE"
