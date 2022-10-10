@@ -1,9 +1,10 @@
 from pathlib import Path
 from typing import Iterable, List, Type, Union
 
+from nonebot.typing import overrides
+
 from nonebot.adapters import Message as BaseMessage
 from nonebot.adapters import MessageSegment as BaseMessageSegment
-from nonebot.typing import overrides
 
 
 class MessageSegment(BaseMessageSegment["Message"]):
@@ -41,10 +42,10 @@ class MessageSegment(BaseMessageSegment["Message"]):
 
     @overrides(BaseMessageSegment)
     def is_text(self) -> bool:
-        return self.type == "text" or self.type == "atmsg"
+        return self.type == "text" or self.type == "room_at_msg"
 
     @staticmethod
-    def chatroom_atmsg(content: str, at_list: List[str]) -> "MessageSegment":
+    def room_at_msg(content: str, at_list: List[str]) -> "MessageSegment":
         """
         说明:
             - 群里发送@消息，文本消息的content的内容中设置占位字符串 {$@},
@@ -55,7 +56,9 @@ class MessageSegment(BaseMessageSegment["Message"]):
             * `content`:文字内容
             * `at_list`：at列表
         """
-        return MessageSegment("atmsg", data={"content": content, "at_list": at_list})
+        return MessageSegment(
+            "room_at_msg", data={"content": content, "at_list": at_list}
+        )
 
     @staticmethod
     def text(content: str) -> "MessageSegment":
