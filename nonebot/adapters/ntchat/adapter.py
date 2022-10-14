@@ -3,11 +3,11 @@
 """
 import asyncio
 import contextlib
+import inspect
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, cast
 
-from nonebot.adapters import Adapter as BaseAdapter
 from nonebot.drivers.fastapi import Driver
 from nonebot.exception import WebSocketClosed
 from nonebot.internal.driver import (
@@ -20,11 +20,18 @@ from nonebot.internal.driver import (
 from nonebot.typing import overrides
 from nonebot.utils import DataclassEncoder, escape_tag
 
+from nonebot.adapters import Adapter as BaseAdapter
+
+from . import event
 from .bot import Bot
+from .collator import EventModels
 from .config import Config
-from .event import Event, EventRister
+from .event import Event
 from .store import ResultStore
 from .utils import handle_api_result, log
+
+event_models = EventModels()
+"""事件模型创建器"""
 
 
 class Adapter(BaseAdapter):
@@ -37,7 +44,16 @@ class Adapter(BaseAdapter):
         self.ntchat_config: Config = Config(**self.config.dict())
         self.connections: Dict[str, WebSocket] = {}
         self.tasks: List["asyncio.Task"] = []
+        self._search_events()
         self._setup()
+
+    def _search_events(self):
+        """搜索事件模型"""
+        for model_name in dir(event):
+            model = getattr(event, model_name)
+            if not inspect.isclass(model) or not issubclass(model, Event):
+                continue
+            event_models.add_event_model(model)
 
     def _setup(self) -> None:
         ws_setup = WebSocketServerSetup(
@@ -161,8 +177,9 @@ class Adapter(BaseAdapter):
             return
 
         # 实例化事件
+        event_model = event_models.get_event_model(json_data)
         try:
-            event = EventRister.get_event(json_data)
+            event = event_model.parse_obj(json_data)
             return event
         except Exception as e:
             log(

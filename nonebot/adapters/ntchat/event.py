@@ -1,41 +1,72 @@
 from copy import deepcopy
-from typing import Any, Dict, List, Type
+from enum import IntEnum
+from typing import Any, Dict, List
 
-from nonebot.adapters import Event as BaseEvent
 from nonebot.typing import overrides
 from nonebot.utils import escape_tag
-from pydantic import root_validator
+from pydantic import BaseModel, root_validator
+
+from nonebot.adapters import Event as BaseEvent
 
 from .message import Message
 from .type import EventType, SubType, WxType
-
-
-class EventRister:
-    """事件注册器"""
-
-    event_dict: Dict[int, Type["Event"]] = {}
-    """事件映射字典"""
-
-    @classmethod
-    def rister(cls, type: EventType):
-        def _rister(event):
-            cls.event_dict[type] = event
-            return event
-
-        return _rister
-
-    @classmethod
-    def get_event(cls, json_data: Dict) -> "Event":
-        event = cls.event_dict.get(json_data["type"])
-        if not event:
-            raise TypeError("未找到对应event。")
-        return event.parse_obj(json_data["data"])
 
 
 class Event(BaseEvent):
     """
     ntchat事件基类
     """
+
+    data: Dict
+    """事件原始数据"""
+    type: int
+    """事件类型"""
+    to_me: bool = False
+    """
+    :说明: 消息是否与机器人有关
+
+    :类型: ``bool``
+    """
+
+    @overrides(BaseEvent)
+    def get_type(self) -> str:
+        try:
+            wx_type = EventType(self.type)
+            return wx_type.name
+        except Exception:
+            return str(self.type)
+
+    @overrides(BaseEvent)
+    def get_event_name(self) -> str:
+        try:
+            wx_type = EventType(self.type)
+            return wx_type.name
+        except Exception:
+            return str(self.type)
+
+    @overrides(BaseEvent)
+    def get_message(self) -> "Message":
+        raise ValueError("事件没有message实例")
+
+    @overrides(BaseEvent)
+    def get_event_description(self) -> str:
+        return escape_tag(str(self.dict()))
+
+    @overrides(BaseEvent)
+    def get_user_id(self) -> str:
+        raise ValueError("事件没有user_id")
+
+    @overrides(BaseEvent)
+    def get_session_id(self) -> str:
+        return str(self.type)
+
+    @overrides(BaseEvent)
+    def is_tome(self) -> bool:
+        return self.to_me
+
+
+class MessageEvent(Event):
+    """消息事件基类"""
 
     timestamp: int
     """时间戳"""
@@ -49,56 +80,6 @@ class Event(BaseEvent):
     """接收者的wxid"""
     msgid: str
     """消息id"""
-    to_me: bool = False
-    """
-    :说明: 消息是否与机器人有关
-
-    :类型: ``bool``
-    """
-
-    @overrides(BaseEvent)
-    def get_type(self) -> str:
-        try:
-            wx_type = WxType(self.wx_type)
-            return wx_type.name
-        except Exception:
-            return str(self.wx_type)
-
-    @overrides(BaseEvent)
-    def get_event_name(self) -> str:
-        try:
-            wx_type = WxType(self.wx_type)
-            return wx_type.name
-        except Exception:
-            return str(self.wx_type)
-
-    @overrides(BaseEvent)
-    def get_message(self) -> "Message":
-        raise ValueError("消息没有message实例")
-
-    @overrides(BaseEvent)
-    def get_event_description(self) -> str:
-        return escape_tag(str(self.dict()))
-
-    @overrides(BaseEvent)
-    def get_user_id(self) -> str:
-        return self.from_wxid
-
-    @overrides(BaseEvent)
-    def get_session_id(self) -> str:
-        if self.room_wxid:
-            return f"group_{self.room_wxid}_{self.from_wxid}"
-        else:
-            return f"{self.from_wxid}"
-
-    @overrides(BaseEvent)
-    def is_tome(self) -> bool:
-        return self.to_me
-
-
-class MessageEvent(Event):
-    """消息事件基类"""
-
     message: Message
     """消息message对象"""
     to_me: bool = False
@@ -125,10 +106,10 @@ class MessageEvent(Event):
         return self.message
 
 
-@EventRister.rister(EventType.MT_RECV_TEXT_MSG)
 class TextMessageEvent(MessageEvent):
     """接收文本消息事件"""
 
+    type: int = EventType.MT_RECV_TEXT_MSG
     at_user_list: List[str]
     """在群里@的wxid列表"""
     msg: str
@@ -142,10 +123,10 @@ class TextMessageEvent(MessageEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_PICTURE_MSG)
 class PictureMessageEvent(MessageEvent):
     """接收图片消息"""
 
+    type: int = EventType.MT_RECV_PICTURE_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
     image_thumb: str
@@ -163,10 +144,10 @@ class PictureMessageEvent(MessageEvent):
             )
 
 
-@EventRister.rister(EventType.MT_RECV_VOICE_MSG)
 class VoiceMessageEvent(MessageEvent):
     """接收语音消息"""
 
+    type: int = EventType.MT_RECV_VOICE_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -178,10 +159,10 @@ class VoiceMessageEvent(MessageEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_CARD_MSG)
 class CardMessageEvent(MessageEvent):
     """接收名片消息"""
 
+    type: int = EventType.MT_RECV_CARD_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -193,10 +174,10 @@ class CardMessageEvent(MessageEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_VIDEO_MSG)
 class ViedeoMessageEvent(MessageEvent):
     """接收视频消息"""
 
+    type: int = EventType.MT_RECV_VIDEO_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -208,10 +189,10 @@ class ViedeoMessageEvent(MessageEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_EMOJI_MSG)
 class EmojiMessageEvent(MessageEvent):
     """接收表情消息"""
 
+    type = EventType.MT_RECV_EMOJI_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -223,10 +204,10 @@ class EmojiMessageEvent(MessageEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_LOCATION_MSG)
 class LocationMessageEvent(MessageEvent):
     """接收位置消息消息"""
 
+    type: int = EventType.MT_RECV_LOCATION_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -238,10 +219,10 @@ class LocationMessageEvent(MessageEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_FRIEND_MSG)
 class FriendRquestEvent(Event):
     """接收加好友请求"""
 
+    type: int = EventType.MT_RECV_FRIEND_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -257,10 +238,10 @@ class FriendRquestEvent(Event):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_SYSTEM_MSG)
 class SystemMessageEvent(Event):
     """接收系统消息"""
 
+    type: int = EventType.MT_RECV_SYSTEM_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -276,10 +257,10 @@ class SystemMessageEvent(Event):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_REVOKE_MSG)
 class RevokeMessageEvent(Event):
     """接收撤回消息"""
 
+    type: int = EventType.MT_RECV_REVOKE_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -295,10 +276,10 @@ class RevokeMessageEvent(Event):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_OTHER_MSG)
 class OtherMessageEvent(Event):
     """接收其他消息，根据wx_type自行判断"""
 
+    type: int = EventType.MT_RECV_OTHER_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -312,6 +293,117 @@ class OtherMessageEvent(Event):
             return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
         else:
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+
+
+class RequestEvent(Event):
+    """请求事件基类"""
+
+    timestamp: int
+    """时间戳"""
+    wx_type: int
+    """消息原始类型"""
+    from_wxid: str
+    """发送者的wxid"""
+    room_wxid: str
+    """群聊的wxid"""
+    to_wxid: str
+    """接收者的wxid"""
+    msgid: str
+    """消息id"""
+
+    @overrides(Event)
+    def get_type(self) -> str:
+        return "message"
+
+
+class FriendAddRequestEvent(RequestEvent):
+    """添加好友请求"""
+
+    type: int = EventType.MT_RECV_FRIEND_MSG
+
+
+class NoticeEvent(Event):
+    """通知事件"""
+
+    @overrides(Event)
+    def get_type(self) -> str:
+        return "notice"
+
+
+class Sex(IntEnum):
+    """性别枚举"""
+
+    Man = 0
+    """男"""
+    Woman = 1
+    """女"""
+
+
+class FriendAddNoticeEvent(NoticeEvent):
+    """好友添加通知"""
+
+    type: int = EventType.MT_FRIEND_ADD_NOTIFY_MSG
+    account: str
+    """微信号"""
+    avatar: str
+    """头像url"""
+    city: str
+    """城市"""
+    country: str
+    """国家"""
+    nickname: str
+    """微信昵称"""
+    remark: str
+    """备注"""
+    sex: Sex
+    """性别"""
+    wxid: str
+    """微信id"""
+
+    @overrides(NoticeEvent)
+    def get_user_id(self) -> str:
+        return self.wxid
+
+    @overrides(NoticeEvent)
+    def get_event_description(self) -> str:
+        return super().get_event_description()
+
+
+class RoomMember(BaseModel):
+    """群成员模型"""
+
+    avatar: str
+    """头像url"""
+    invite_by: str
+    """邀请人wxid"""
+    nickname: str
+    """群内昵称"""
+    wxid: str
+    """成员wxid"""
+
+
+class InvitedRoomEvent(NoticeEvent):
+    """被邀请入群事件"""
+
+    type: int = EventType.MT_ROOM_INTIVTED_NOTIFY_MSG
+    avatar: str
+    """群头像url"""
+    is_manager: bool
+    """你是否为管理员"""
+    manager_wxid: str
+    """管理员微信id"""
+    member_list: List[RoomMember]
+    """成员列表"""
+    nickname: str
+    """群名"""
+    room_wxid: str
+    """群wxid"""
+    total_member: int
+    """群内总人数"""
+
+    @overrides(NoticeEvent)
+    def get_event_description(self) -> str:
+        return super().get_event_description()
 
 
 class AppEvent(Event):
@@ -334,10 +426,10 @@ class AppEvent(Event):
         return f"Message.{wx_type.name}.{sub_type.name}"
 
 
-@EventRister.rister(EventType.MT_RECV_LINK_MSG)
 class LinkMessageEvent(AppEvent):
     """接收链接消息"""
 
+    type: int = EventType.MT_RECV_LINK_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -349,10 +441,10 @@ class LinkMessageEvent(AppEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_FILE_MSG)
 class FileMessageEvent(AppEvent):
     """接收文件消息"""
 
+    type: int = EventType.MT_RECV_FILE_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -364,10 +456,10 @@ class FileMessageEvent(AppEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_MINIAPP_MSG)
 class MiniAppMessageEvent(AppEvent):
     """接收小程序消息"""
 
+    type: int = EventType.MT_RECV_MINIAPP_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -379,10 +471,10 @@ class MiniAppMessageEvent(AppEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_WCPAY_MSG)
 class WcpayMessageEvent(AppEvent):
     """接收转帐消息"""
 
+    type: int = EventType.MT_RECV_WCPAY_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -394,10 +486,10 @@ class WcpayMessageEvent(AppEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-@EventRister.rister(EventType.MT_RECV_OTHER_APP_MSG)
 class OtherAppMessageEvent(AppEvent):
     """接收其他应用类型消息,自行判断"""
 
+    type: int = EventType.MT_RECV_OTHER_APP_MSG
     raw_msg: str
     """微信中的原始消息,xml格式"""
 

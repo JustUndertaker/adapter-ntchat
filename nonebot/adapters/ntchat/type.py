@@ -76,6 +76,10 @@ class EventType(IntEnum):
     """群员新增通知"""
     MT_ROOM_DEL_MEMBER_NOTIFY_MSG = 11099
     """群员删除通知"""
+    MT_ROOM_INTIVTED_NOTIFY_MSG = 11100
+    """被邀请入群通知"""
+    MT_FRIEND_ADD_NOTIFY_MSG = 11102
+    """好友添加通知"""
 
 
 class WxType(IntEnum):
@@ -116,5 +120,7 @@ class SubType(IntEnum):
     """合并消息"""
     WX_APPMSG_MINIAPP = 33
     """小程序"""
+    WX_APPMSG_QUOTE = 57
+    """引用消息"""
     WX_APPMSG_WCPAY = 2000
     """转账"""
