@@ -1,3 +1,5 @@
+from base64 import b64encode
+from io import BytesIO
 from pathlib import Path
 from typing import Iterable, List, Type, Union
 
@@ -87,31 +89,47 @@ class MessageSegment(BaseMessageSegment["Message"]):
         )
 
     @staticmethod
-    def image(file: Union[str, Path]) -> "MessageSegment":
+    def image(file: Union[str, bytes, BytesIO, Path]) -> "MessageSegment":
         """图片消息"""
-        if isinstance(file, str):
-            file = Path(file)
+        if isinstance(file, BytesIO):
+            file = file.getvalue()
+        if isinstance(file, bytes):
+            file = f"base64://{b64encode(file).decode()}"
+        elif isinstance(file, Path):
+            file = file.resolve().as_uri()
         return MessageSegment("image", {"file": file})
 
     @staticmethod
-    def file(file: Union[str, Path]) -> "MessageSegment":
+    def file(file: Union[str, bytes, BytesIO, Path]) -> "MessageSegment":
         """文件消息"""
-        if isinstance(file, str):
-            file = Path(file)
+        if isinstance(file, BytesIO):
+            file = file.getvalue()
+        if isinstance(file, bytes):
+            file = f"base64://{b64encode(file).decode()}"
+        elif isinstance(file, Path):
+            file = file.resolve().as_uri()
         return MessageSegment("file", {"file": file})
 
     @staticmethod
-    def video(file: Union[str, Path]) -> "MessageSegment":
+    def video(file: Union[str, bytes, BytesIO, Path]) -> "MessageSegment":
         """视频消息"""
-        if isinstance(file, str):
-            file = Path(file)
+        if isinstance(file, BytesIO):
+            file = file.getvalue()
+        if isinstance(file, bytes):
+            file = f"base64://{b64encode(file).decode()}"
+        elif isinstance(file, Path):
+            file = file.resolve().as_uri()
         return MessageSegment("video", {"file": file})
 
     @staticmethod
-    def gif(file: Union[str, Path]) -> "MessageSegment":
+    def gif(file: Union[str, bytes, BytesIO, Path]) -> "MessageSegment":
         """gif消息"""
-        if isinstance(file, str):
-            file = Path(file)
+        if isinstance(file, BytesIO):
+            file = file.getvalue()
+        if isinstance(file, bytes):
+            file = f"base64://{b64encode(file).decode()}"
+        elif isinstance(file, Path):
+            file = file.resolve().as_uri()
         return MessageSegment("file", {"file": file})
 
     @staticmethod

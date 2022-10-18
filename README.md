@@ -19,7 +19,7 @@ pip install nonebot-adapter-ntchat
 
 ### 使用源码（不推荐）
 
-```bash	
+```bash
 git clone https://github.com/JustUndertaker/adapter-ntchat.git
 ```
 
@@ -32,41 +32,6 @@ git clone https://github.com/JustUndertaker/adapter-ntchat.git
 - [ ] ~~正向ws~~
 
 其他的感觉用处不大就...
-
-## 配置
-
-与原nonebot2的配置一样，但是由于拓展了`send_image`接口，所以会有一个缓存图片的文件夹，默认是在`./image_cache`，如需更改，请修改以下配置：
-
-```dotenv
-chache_path = "./image_cache"
-```
-
-**注意**：目前这个文件夹不会自动清理，如需自动清理，请使用定时插件写一个定时清理程序，比如：
-
-```py
-from nonebot import get_driver
-from nonebot.log import logger
-from nonebot import require
-
-require("nonebot_plugin_apscheduler")
-
-from nonebot_plugin_apscheduler import scheduler
-
-@scheduler.scheduled_job(trigger="cron", hour=0, minute=0)
-async def clean_cache():
-    """清理图片缓存"""
-    logger.info("正在清理图片缓存...")
-    config = get_driver().config
-    path = Path(config.chache_path)
-    files = path.rglob("*.image")
-    count = 0
-    for one in files:
-        count += 1
-        one.unlink()
-    logger.info(f"图片清理完毕，共清理：{count} 个...")
-```
-
-这样每天0点就会自动清理图片缓存了
 
 ## 注意事项
 

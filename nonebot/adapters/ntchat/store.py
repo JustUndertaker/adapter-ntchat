@@ -1,13 +1,9 @@
-"""存储相关，API回调存储，和bot图片发送缓存
+"""API回调存储
 """
 
 import asyncio
 import sys
-from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
-
-from httpx import AsyncClient
-from nonebot.utils import run_sync
 
 from .exception import NetworkError
 
@@ -40,38 +36,3 @@ class ResultStore:
             raise NetworkError("WebSocket API call timeout") from None
         finally:
             del self._futures[(self_id, seq)]
-
-
-class ImageCache:
-    """bot图片缓存"""
-
-    def __init__(self) -> None:
-        self._seq: int = 1
-        self._client = AsyncClient(
-            headers={
-                "User-Agent": "Mozilla/5.0(X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
-            }
-        )
-
-    def get_seq(self) -> str:
-        s = self._seq
-        self._seq = (self._seq + 1) % sys.maxsize
-        return f"{str(s)}.image"
-
-    @run_sync
-    def _save(self, image: bytes, path: Path):
-        """储存文件"""
-        with open(path, mode="wb") as f:
-            f.write(image)
-
-    async def get(self, url: str) -> bytes:
-        """请求获取图片"""
-        res = await self._client.get(url)
-        return res.content
-
-    async def save_image(self, chache_path: Path, image: bytes) -> Path:
-        """储存图片，返回路径"""
-        seq = self.get_seq()
-        path = chache_path / seq
-        await self._save(image, path)
-        return path

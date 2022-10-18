@@ -1,19 +1,14 @@
 import re
-from pathlib import Path
 from typing import Any, Callable, Union
 
-from nonebot.adapters import Bot as BaseBot
 from nonebot.message import handle_event
 from nonebot.typing import overrides
-from yarl import URL
+
+from nonebot.adapters import Bot as BaseBot
 
 from .event import Event, TextMessageEvent
 from .message import MessageSegment
-from .store import ImageCache
 from .utils import log
-
-image_cache = ImageCache()
-"""图片缓存辅助"""
 
 
 def _check_at_me(bot: "Bot", event: TextMessageEvent) -> None:
@@ -108,28 +103,3 @@ class Bot(BaseBot):
             ActionFailed: API 调用失败
         """
         return await self.__class__.send_handler(self, event, message, **kwargs)
-
-    async def send_image(self, to_wxid: str, file: Union[str, Path, bytes]):
-        """
-        说明:
-            发送图片接口，对原有接口进行封装，方便发送
-
-        参数:
-            * `to_wxid`：接收方的wx_id，可以是好友id，也可以是room_id
-            * `file`：图片文件，支持url，本地路径，bytes
-        """
-        if isinstance(file, str):
-            url = URL(file)
-            if url.scheme == "http" or url.scheme == "https":
-                cache_path = Path(self.config.chache_path)
-                image = await image_cache.get(file)
-                file = await image_cache.save_image(cache_path, image)
-            else:
-                file = Path(file)
-        elif isinstance(file, bytes):
-            cache_path = Path(self.config.chache_path)
-            file = await image_cache.save_image(cache_path, file)
-
-        await self.call_api(
-            "send_image", to_wxid=to_wxid, file_path=str(file.absolute())
-        )
