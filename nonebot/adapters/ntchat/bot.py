@@ -1,3 +1,4 @@
+import asyncio
 import re
 from typing import Any, Callable, Union
 
@@ -7,7 +8,7 @@ from nonebot.typing import overrides
 from nonebot.adapters import Bot as BaseBot
 
 from .event import Event, TextMessageEvent
-from .message import MessageSegment
+from .message import Message, MessageSegment
 from .utils import log
 
 
@@ -49,21 +50,26 @@ def _check_nickname(bot: "Bot", event: TextMessageEvent) -> None:
 async def send(
     bot: "Bot",
     event: Event,
-    message: Union[str, MessageSegment],
+    message: Union[str, MessageSegment, Message],
     **params: Any,  # extra options passed to send_msg API
 ) -> Any:
     """默认回复消息处理函数。"""
-    if isinstance(message, str):
-        message = MessageSegment.text(message)
+    from_wxid = getattr(event, "from_wxid")
+    room_wxid = getattr(event, "room_wxid")
+    if room_wxid is None or from_wxid is None:
+        raise ValueError("该类型事件没有交互对象，无法发送消息！")
+    wx_id = from_wxid if room_wxid == "" else room_wxid
 
-    api = f"send_{message.type}"
-    room_id = event.room_wxid
-    if room_id == "":
-        message.data["to_wxid"] = event.from_wxid
-    else:
-        message.data["to_wxid"] = room_id
+    if isinstance(message, str) or isinstance(message, MessageSegment):
+        message = Message(message)
 
-    return await bot.call_api(api, **message.data)
+    task = []
+    for segment in message:
+        api = f"send_{segment.type}"
+        segment.data["to_wxid"] = wx_id
+        task.append(bot.call_api(api, **segment.data))
+
+    return await asyncio.gather(*task)
 
 
 class Bot(BaseBot):
