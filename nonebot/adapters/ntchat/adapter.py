@@ -30,7 +30,7 @@ from .event import Event
 from .store import ResultStore
 from .utils import handle_api_result, log
 
-event_models = EventModels()
+event_models = EventModels[Event]()
 """事件模型创建器"""
 
 

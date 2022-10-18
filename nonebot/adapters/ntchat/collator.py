@@ -1,11 +1,11 @@
-from typing import Dict, Type, TypeVar
+from typing import Dict, Generic, Type, TypeVar
 
 from .event import Event
 
 E = TypeVar("E", bound=Event)
 
 
-class EventModels:
+class EventModels(Generic[E]):
     """
     事件创建器
     """
