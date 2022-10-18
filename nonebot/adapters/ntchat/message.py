@@ -89,37 +89,37 @@ class MessageSegment(BaseMessageSegment["Message"]):
         )
 
     @staticmethod
-    def image(file: Union[str, bytes, BytesIO, Path]) -> "MessageSegment":
+    def image(file_path: Union[str, bytes, BytesIO, Path]) -> "MessageSegment":
         """图片消息"""
-        if isinstance(file, BytesIO):
-            file = file.getvalue()
-        if isinstance(file, bytes):
-            file = f"base64://{b64encode(file).decode()}"
-        elif isinstance(file, Path):
-            file = file.resolve().as_uri()
-        return MessageSegment("image", {"file": file})
+        if isinstance(file_path, BytesIO):
+            file_path = file_path.getvalue()
+        if isinstance(file_path, bytes):
+            file_path = f"base64://{b64encode(file_path).decode()}"
+        elif isinstance(file_path, Path):
+            file_path = file_path.resolve().as_uri()
+        return MessageSegment("image", {"file_path": file_path})
 
     @staticmethod
-    def file(file: Union[str, bytes, BytesIO, Path]) -> "MessageSegment":
+    def file(file_path: Union[str, bytes, BytesIO, Path]) -> "MessageSegment":
         """文件消息"""
-        if isinstance(file, BytesIO):
-            file = file.getvalue()
-        if isinstance(file, bytes):
-            file = f"base64://{b64encode(file).decode()}"
-        elif isinstance(file, Path):
-            file = file.resolve().as_uri()
-        return MessageSegment("file", {"file": file})
+        if isinstance(file_path, BytesIO):
+            file_path = file_path.getvalue()
+        if isinstance(file_path, bytes):
+            file_path = f"base64://{b64encode(file_path).decode()}"
+        elif isinstance(file_path, Path):
+            file_path = file_path.resolve().as_uri()
+        return MessageSegment("file", {"file_path": file_path})
 
     @staticmethod
-    def video(file: Union[str, bytes, BytesIO, Path]) -> "MessageSegment":
+    def video(file_path: Union[str, bytes, BytesIO, Path]) -> "MessageSegment":
         """视频消息"""
-        if isinstance(file, BytesIO):
-            file = file.getvalue()
-        if isinstance(file, bytes):
-            file = f"base64://{b64encode(file).decode()}"
-        elif isinstance(file, Path):
-            file = file.resolve().as_uri()
-        return MessageSegment("video", {"file": file})
+        if isinstance(file_path, BytesIO):
+            file_path = file_path.getvalue()
+        if isinstance(file_path, bytes):
+            file_path = f"base64://{b64encode(file_path).decode()}"
+        elif isinstance(file_path, Path):
+            file_path = file_path.resolve().as_uri()
+        return MessageSegment("video", {"file_path": file_path})
 
     @staticmethod
     def gif(file: Union[str, bytes, BytesIO, Path]) -> "MessageSegment":

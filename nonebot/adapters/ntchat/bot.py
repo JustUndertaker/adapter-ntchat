@@ -1,5 +1,7 @@
 import asyncio
 import re
+from io import BytesIO
+from pathlib import Path
 from typing import Any, Callable, Union
 
 from nonebot.message import handle_event
@@ -111,3 +113,61 @@ class Bot(BaseBot):
             ActionFailed: API 调用失败
         """
         return await self.__class__.send_handler(self, event, message, **kwargs)
+
+    async def send_image(
+        self, to_wxid: str, file_path: Union[str, bytes, BytesIO, Path]
+    ):
+        """
+        说明:
+            发送图片
+
+        参数:
+            * `to_wxid`：接收方的wx_id，可以是好友id，也可以是room_id
+            * `file`：图片内容，支持url，本地路径，bytes，BytesIO
+        """
+        data = MessageSegment.image(file_path=file_path).data
+        data["to_wxid"] = to_wxid
+        return await self.call_api("send_image", **data)
+
+    async def send_file(
+        self, *, to_wxid: str, file_path: Union[str, bytes, BytesIO, Path]
+    ):
+        """
+        说明:
+            发送文件
+
+        参数:
+            * `to_wxid`：接收人id
+            * `file_path`：文件内容，支持url，本地路径，bytes，BytesIO
+        """
+        data = MessageSegment.file(file_path=file_path).data
+        data["to_wxid"] = to_wxid
+        return await self.call_api("send_file", **data)
+
+    async def send_video(
+        self, *, to_wxid: str, file_path: Union[str, bytes, BytesIO, Path]
+    ):
+        """
+        说明:
+            发送视频
+
+        参数:
+            * `to_wxid`：接收人id
+            * `file_path`：视频内容，支持url，本地路径，bytes，BytesIO
+        """
+        data = MessageSegment.video(file_path=file_path).data
+        data["to_wxid"] = to_wxid
+        return await self.call_api("send_video", **data)
+
+    async def send_gif(self, *, to_wxid: str, file: Union[str, bytes, BytesIO, Path]):
+        """
+        说明:
+            发送gif图片
+
+        参数:
+            * `to_wxid`：接收人id
+            * `file`：图片内容，支持url，本地路径，bytes，BytesIO
+        """
+        data = MessageSegment.gif(file == file).data
+        data["to_wxid"] = to_wxid
+        return await self.call_api("send_gif", **data)

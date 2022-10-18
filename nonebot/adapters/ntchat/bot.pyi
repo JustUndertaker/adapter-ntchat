@@ -184,14 +184,16 @@ class Bot(BaseBot):
             * `image_url`：图片地址
         """
         ...
-    async def send_image(self, to_wxid: str, file: Union[str, bytes, BytesIO, Path]):
+    async def send_image(
+        self, to_wxid: str, file_path: Union[str, bytes, BytesIO, Path]
+    ):
         """
         说明:
             发送图片
 
         参数:
             * `to_wxid`：接收方的wx_id，可以是好友id，也可以是room_id
-            * `file`：图片内容，支持url，本地路径，bytes，BytesIO
+            * `file_path`：图片内容，支持url，本地路径，bytes，BytesIO
         """
         ...
     async def send_file(
@@ -218,16 +220,14 @@ class Bot(BaseBot):
             * `file_path`：视频内容，支持url，本地路径，bytes，BytesIO
         """
         ...
-    async def send_gif(
-        self, *, to_wxid: str, file_path: Union[str, bytes, BytesIO, Path]
-    ):
+    async def send_gif(self, *, to_wxid: str, file: Union[str, bytes, BytesIO, Path]):
         """
         说明:
             发送gif图片
 
         参数:
             * `to_wxid`：接收人id
-            * `file_path`：图片内容，支持url，本地路径，bytes，BytesIO
+            * `file`：图片内容，支持url，本地路径，bytes，BytesIO
         """
         ...
     async def send_xml(self, *, to_wxid: str, xml: str, app_type: int = 5):
