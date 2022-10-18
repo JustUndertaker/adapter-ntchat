@@ -8,6 +8,7 @@ from nonebot.typing import overrides
 from nonebot.adapters import Bot as BaseBot
 
 from .event import Event, TextMessageEvent
+from .exception import NotInteractableEventError
 from .message import Message, MessageSegment
 from .utils import log
 
@@ -54,10 +55,11 @@ async def send(
     **params: Any,  # extra options passed to send_msg API
 ) -> Any:
     """默认回复消息处理函数。"""
-    from_wxid = getattr(event, "from_wxid")
-    room_wxid = getattr(event, "room_wxid")
-    if room_wxid is None or from_wxid is None:
-        raise ValueError("该类型事件没有交互对象，无法发送消息！")
+    try:
+        from_wxid = getattr(event, "from_wxid")
+        room_wxid = getattr(event, "room_wxid")
+    except AttributeError:
+        raise NotInteractableEventError("该类型事件没有交互对象，无法发送消息！")
     wx_id = from_wxid if room_wxid == "" else room_wxid
 
     if isinstance(message, str) or isinstance(message, MessageSegment):
