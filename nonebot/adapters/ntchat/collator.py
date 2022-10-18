@@ -15,11 +15,9 @@ class EventModels(Generic[E]):
 
     def add_event_model(self, event: Type[E]):
         """添加事件模型"""
-        try:
-            event_type = event.type
+        event_type = event.__fields__.get("type").default
+        if event_type:
             self.event_dict[event_type] = event
-        except AttributeError:
-            pass
 
     def get_event_model(self, data: Dict) -> Type[E]:
         """获取事件模型"""

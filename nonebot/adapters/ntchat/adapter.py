@@ -176,6 +176,7 @@ class Adapter(BaseAdapter):
         # 实例化事件
         event_model = event_models.get_event_model(json_data)
         try:
+            json_data.update(**json_data.get("data"))
             event = event_model.parse_obj(json_data)
             return event
         except Exception as e:
