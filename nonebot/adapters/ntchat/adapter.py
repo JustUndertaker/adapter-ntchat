@@ -5,7 +5,6 @@ import asyncio
 import contextlib
 import inspect
 import json
-from pathlib import Path
 from typing import Any, Dict, List, Optional, cast
 
 from nonebot.drivers.fastapi import Driver
@@ -67,8 +66,6 @@ class Adapter(BaseAdapter):
         ws_setup = WebSocketServerSetup(
             URL("/ntchat/ws/"), self.get_name(), self._handle_ws
         )
-        path = Path(self.ntchat_config.chache_path)
-        path.mkdir(parents=True, exist_ok=True)
         self.setup_websocket_server(ws_setup)
 
     @classmethod
