@@ -56,8 +56,8 @@ async def send(
 ) -> Any:
     """默认回复消息处理函数。"""
     try:
-        from_wxid = getattr(event, "from_wxid")
-        room_wxid = getattr(event, "room_wxid")
+        from_wxid: str = getattr(event, "from_wxid")
+        room_wxid: str = getattr(event, "room_wxid")
     except AttributeError:
         raise NotInteractableEventError("该类型事件没有交互对象，无法发送消息！")
     wx_id = from_wxid if room_wxid == "" else room_wxid
