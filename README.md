@@ -35,11 +35,9 @@ git clone https://github.com/JustUndertaker/adapter-ntchat.git
 
 ## 注意事项
 
-由于微信不支持连续不同类型消息发出（比如图文消息，发出来会变成2条），所以nonebot2的Message没有具体实现，所需要注意的点如下：
+由于微信不支持连续不同类型消息发出（比如图文消息，发出来会变成2条），需注意：
 
-- matcher的默认发送只支持一段消息，因此mather.send，matcher.finish等函数附带的消息只能是str，或者MessageSegment，不能是Message
-- 可以构造MessageSegment来使用matcher.send等其他函数
-- 或者使用bot.call_api来发送消息，具体参数都在提示中有写
+- matcher的默认发送支持str，MessageSegment，Message，但是发送Message会同时发送多条消息（每个MessageSegment都会发送一条消息）。
 
 ## 已实现事件
 
@@ -85,6 +83,46 @@ async def _(event:PictureMessageEvent):
 
 上述例子会监听所有的图片消息事件。
 
+### 发送图片
+
+使用MessageSegment.image发送图片（其他消息同理），图片与其他文件支持url、bytes、BytesIO、base64、Path发送，手动发送base64时需要在字符串前面加上"base64://"，下面是发送图片的例子.
+
+```python
+from base64 import b64encode
+from io import BytesIO
+from pathlib import Path
+
+from nonebot import on_regex
+from nonebot.adapter.ntchat import MessageSegment,TextMessageEvent
+
+matcher = on_regex(r"^测试$")
+
+@matcher.handle()
+async def _(event:TextMessageEvent):
+    url = "https://v2.nonebot.dev/logo.png"
+    image = MessageSegment.image(url)						# 使用url构造
+    await matcher.send(image)
+    
+    image_path = Path("./1.png")
+    image = MessageSegment.image(image_path)				# 使用Path构造
+    await matcher.send(image)
+    
+    with open(image_path, mode="rb") as f:
+        data = f.read()
+    image = MessageSegment.image(data)						# 使用bytes构造
+    await matcher.send(image)
+    
+    bio = BytesIO(data)
+    image = MessageSegment.image(bio)						# 使用BytesIO构造
+    await matcher.send(image)
+    
+    base64_data = f"base64://{b64encode(data).decode()}"	# 使用base64构造
+    image = MessageSegment.image(base64_data)
+    await matcher.finish(image)
+```
+
+
+
 ### Permission
 
 内置2个Permission，为：
@@ -112,10 +150,7 @@ async def _(event:PictureMessageEvent):
   - 占位字符串的数量必须和at_list中的微信数量相等.
 - **send_card**：发送名片
 - **send_link_card**：发送链接卡片
-- **send_image**：发送图片接口，对原有接口进行封装，方便发送，注意：
-  - 由于ntchat接口只支持本地路径发送，所以adapter做了一些封装
-  - 目前支持str路径，Path路径，url路径，bytes
-  - 由于是本地路径，所以nb2和ntchat-client必须在同一台机器上
+- **send_image**：发送图片接口
 - **send_file**：发送文件
 - **send_video**：发送视频
 - **send_gif**：发送gif图片
