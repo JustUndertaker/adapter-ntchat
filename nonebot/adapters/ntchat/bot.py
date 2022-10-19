@@ -168,6 +168,6 @@ class Bot(BaseBot):
             * `to_wxid`：接收人id
             * `file`：图片内容，支持url，本地路径，bytes，BytesIO
         """
-        data = MessageSegment.gif(file == file).data
+        data = MessageSegment.gif(file=file).data
         data["to_wxid"] = to_wxid
         return await self.call_api("send_gif", **data)
