@@ -418,12 +418,12 @@ class AppEvent(Event):
 
     @overrides(Event)
     def get_event_name(self) -> str:
-        wx_type = WxType(self.wx_type)
+        wx_type = WxType(self.wx_type).name
         try:
-            sub_type = SubType(self.wx_sub_type)
+            sub_type = SubType(self.wx_sub_type).name
         except Exception:
             sub_type = self.wx_sub_type
-        return f"Message.{wx_type.name}.{sub_type.name}"
+        return f"Message.{wx_type}.{sub_type}"
 
 
 class LinkMessageEvent(AppEvent):

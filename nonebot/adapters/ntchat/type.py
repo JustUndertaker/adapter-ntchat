@@ -116,6 +116,8 @@ class SubType(IntEnum):
     """链接（包含群邀请）"""
     WX_APPMSG_FILE = 6
     """文件"""
+    WX_APPMSG_EMOJI = 8
+    """表情消息"""
     WX_APPMSG_MUTIL = 19
     """合并消息"""
     WX_APPMSG_MINIAPP = 33
