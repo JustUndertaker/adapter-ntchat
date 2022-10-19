@@ -219,29 +219,24 @@ class LocationMessageEvent(MessageEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-class FriendRquestEvent(Event):
-    """接收加好友请求"""
-
-    type: int = EventType.MT_RECV_FRIEND_MSG
-    raw_msg: str
-    """微信中的原始消息,xml格式"""
-
-    @overrides(Event)
-    def get_type(self) -> str:
-        return "request"
-
-    @overrides(Event)
-    def get_event_description(self) -> str:
-        if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
-        else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
-
-
 class SystemMessageEvent(Event):
     """接收系统消息"""
 
     type: int = EventType.MT_RECV_SYSTEM_MSG
+    timestamp: int
+    """时间戳"""
+    wx_type: int
+    """消息原始类型"""
+    from_wxid: str
+    """发送者的wxid"""
+    room_wxid: str
+    """群聊的wxid"""
+    to_wxid: str
+    """接收者的wxid"""
+    msgid: str
+    """消息id"""
+    message: Message
+    """消息message对象"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -257,29 +252,24 @@ class SystemMessageEvent(Event):
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
-class RevokeMessageEvent(Event):
-    """接收撤回消息"""
-
-    type: int = EventType.MT_RECV_REVOKE_MSG
-    raw_msg: str
-    """微信中的原始消息,xml格式"""
-
-    @overrides(Event)
-    def get_type(self) -> str:
-        return "notice"
-
-    @overrides(Event)
-    def get_event_description(self) -> str:
-        if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
-        else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
-
-
 class OtherMessageEvent(Event):
     """接收其他消息，根据wx_type自行判断"""
 
     type: int = EventType.MT_RECV_OTHER_MSG
+    timestamp: int
+    """时间戳"""
+    wx_type: int
+    """消息原始类型"""
+    from_wxid: str
+    """发送者的wxid"""
+    room_wxid: str
+    """群聊的wxid"""
+    to_wxid: str
+    """接收者的wxid"""
+    msgid: str
+    """消息id"""
+    message: Message
+    """消息message对象"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -320,6 +310,15 @@ class FriendAddRequestEvent(RequestEvent):
     """添加好友请求"""
 
     type: int = EventType.MT_RECV_FRIEND_MSG
+    raw_msg: str
+    """微信中的原始消息,xml格式"""
+
+    @overrides(Event)
+    def get_event_description(self) -> str:
+        if self.room_wxid:
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+        else:
+            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
 class NoticeEvent(Event):
@@ -328,6 +327,35 @@ class NoticeEvent(Event):
     @overrides(Event)
     def get_type(self) -> str:
         return "notice"
+
+
+class RevokeMessageEvent(NoticeEvent):
+    """接收撤回消息"""
+
+    type: int = EventType.MT_RECV_REVOKE_MSG
+    timestamp: int
+    """时间戳"""
+    wx_type: int
+    """消息原始类型"""
+    from_wxid: str
+    """发送者的wxid"""
+    room_wxid: str
+    """群聊的wxid"""
+    to_wxid: str
+    """接收者的wxid"""
+    msgid: str
+    """消息id"""
+    message: Message
+    """消息message对象"""
+    raw_msg: str
+    """微信中的原始消息,xml格式"""
+
+    @overrides(NoticeEvent)
+    def get_event_description(self) -> str:
+        if self.room_wxid:
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+        else:
+            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
 
 
 class Sex(IntEnum):
@@ -409,6 +437,20 @@ class InvitedRoomEvent(NoticeEvent):
 class AppEvent(Event):
     """app事件"""
 
+    timestamp: int
+    """时间戳"""
+    wx_type: int
+    """消息原始类型"""
+    from_wxid: str
+    """发送者的wxid"""
+    room_wxid: str
+    """群聊的wxid"""
+    to_wxid: str
+    """接收者的wxid"""
+    msgid: str
+    """消息id"""
+    message: Message
+    """消息message对象"""
     wx_sub_type: int
     """消息子类型"""
 
