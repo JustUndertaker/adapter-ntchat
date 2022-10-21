@@ -136,12 +136,11 @@ class PictureMessageEvent(MessageEvent):
 
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
+        msg = "[图片消息]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.image)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return (
-                f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.image)}"
-            )
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class VoiceMessageEvent(MessageEvent):
@@ -153,10 +152,11 @@ class VoiceMessageEvent(MessageEvent):
 
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
+        msg = "[语音消息]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class CardMessageEvent(MessageEvent):
@@ -168,10 +168,11 @@ class CardMessageEvent(MessageEvent):
 
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
+        msg = "[名片消息]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class ViedeoMessageEvent(MessageEvent):
@@ -183,10 +184,11 @@ class ViedeoMessageEvent(MessageEvent):
 
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
+        msg = "[视频消息]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class EmojiMessageEvent(MessageEvent):
@@ -198,10 +200,11 @@ class EmojiMessageEvent(MessageEvent):
 
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
+        msg = "[表情消息]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class LocationMessageEvent(MessageEvent):
@@ -213,10 +216,11 @@ class LocationMessageEvent(MessageEvent):
 
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
+        msg = "[位置消息]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class SystemMessageEvent(Event):
@@ -246,10 +250,11 @@ class SystemMessageEvent(Event):
 
     @overrides(Event)
     def get_event_description(self) -> str:
+        msg = "[系统消息]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class OtherMessageEvent(Event):
@@ -279,10 +284,11 @@ class OtherMessageEvent(Event):
 
     @overrides(Event)
     def get_event_description(self) -> str:
+        msg = "[其他未知消息]请查看对应type和raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class RequestEvent(Event):
@@ -315,10 +321,11 @@ class FriendAddRequestEvent(RequestEvent):
 
     @overrides(Event)
     def get_event_description(self) -> str:
+        msg = "[好友请求消息]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class NoticeEvent(Event):
@@ -352,10 +359,11 @@ class RevokeMessageEvent(NoticeEvent):
 
     @overrides(NoticeEvent)
     def get_event_description(self) -> str:
+        msg = "[撤回通知]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class Sex(IntEnum):
@@ -394,7 +402,7 @@ class FriendAddNoticeEvent(NoticeEvent):
 
     @overrides(NoticeEvent)
     def get_event_description(self) -> str:
-        return super().get_event_description()
+        return f"[好友添加通知]:{self.dict()}"
 
 
 class RoomMember(BaseModel):
@@ -431,7 +439,7 @@ class InvitedRoomEvent(NoticeEvent):
 
     @overrides(NoticeEvent)
     def get_event_description(self) -> str:
-        return super().get_event_description()
+        return f"[被邀请入群通知]：{self.dict()}"
 
 
 class AppEvent(Event):
@@ -477,10 +485,11 @@ class LinkMessageEvent(AppEvent):
 
     @overrides(Event)
     def get_event_description(self) -> str:
+        msg = "[小程序链接事件]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class FileMessageEvent(AppEvent):
@@ -492,10 +501,11 @@ class FileMessageEvent(AppEvent):
 
     @overrides(Event)
     def get_event_description(self) -> str:
+        msg = "[接收文件事件]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class MiniAppMessageEvent(AppEvent):
@@ -507,10 +517,11 @@ class MiniAppMessageEvent(AppEvent):
 
     @overrides(Event)
     def get_event_description(self) -> str:
+        msg = "[小程序消息]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class WcpayMessageEvent(AppEvent):
@@ -522,10 +533,11 @@ class WcpayMessageEvent(AppEvent):
 
     @overrides(Event)
     def get_event_description(self) -> str:
+        msg = "[转账消息]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
 class OtherAppMessageEvent(AppEvent):
@@ -537,7 +549,8 @@ class OtherAppMessageEvent(AppEvent):
 
     @overrides(Event)
     def get_event_description(self) -> str:
+        msg = "[其他应用消息]请查看raw_msg和其他字段"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.raw_msg)}"
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
