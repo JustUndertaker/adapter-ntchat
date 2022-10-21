@@ -273,8 +273,6 @@ class OtherMessageEvent(Event):
     """接收者的wxid"""
     msgid: str
     """消息id"""
-    message: Message
-    """消息message对象"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -340,8 +338,6 @@ class RevokeMessageEvent(NoticeEvent):
     """接收撤回消息"""
 
     type: int = EventType.MT_RECV_REVOKE_MSG
-    timestamp: int
-    """时间戳"""
     wx_type: int
     """消息原始类型"""
     from_wxid: str
@@ -350,10 +346,6 @@ class RevokeMessageEvent(NoticeEvent):
     """群聊的wxid"""
     to_wxid: str
     """接收者的wxid"""
-    msgid: str
-    """消息id"""
-    message: Message
-    """消息message对象"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -457,8 +449,6 @@ class AppEvent(Event):
     """接收者的wxid"""
     msgid: str
     """消息id"""
-    message: Message
-    """消息message对象"""
     wx_sub_type: int
     """消息子类型"""
 

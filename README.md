@@ -1,7 +1,7 @@
 <h1 align="center">Nonebot Adapter Ntchat</h1>
 
 <p align="center">
-    <a href="https://github.com/JustUndertaker/ntchat-client/releases"><img src="https://img.shields.io/badge/release-0.3.0-blue.svg?" alt="release"></a>
+    <a href="https://github.com/JustUndertaker/ntchat-client/releases"><img src="https://img.shields.io/badge/release-0.3.1-blue.svg?" alt="release"></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?" alt="License"></a>
 </p>
 
@@ -103,20 +103,20 @@ async def _(event:TextMessageEvent):
     url = "https://v2.nonebot.dev/logo.png"
     image = MessageSegment.image(url)						# 使用url构造
     await matcher.send(image)
-    
+
     image_path = Path("./1.png")
     image = MessageSegment.image(image_path)				# 使用Path构造
     await matcher.send(image)
-    
+
     with open(image_path, mode="rb") as f:
         data = f.read()
     image = MessageSegment.image(data)						# 使用bytes构造
     await matcher.send(image)
-    
+
     bio = BytesIO(data)
     image = MessageSegment.image(bio)						# 使用BytesIO构造
     await matcher.send(image)
-    
+
     base64_data = f"base64://{b64encode(data).decode()}"	# 使用base64构造
     image = MessageSegment.image(base64_data)
     await matcher.finish(image)
