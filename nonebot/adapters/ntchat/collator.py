@@ -10,10 +10,10 @@ class EventModels(Generic[E]):
     事件创建器
     """
 
-    event_dict: Dict[int, Type[E]]
+    event_dict: Dict[int, Type[E]] = {}
     """事件模型字典"""
 
-    def add_event_model(self, event: Type[E]):
+    def add_event_model(self, event: Type[E]) -> None:
         """添加事件模型"""
         event_type = event.__fields__.get("type").default
         if event_type:

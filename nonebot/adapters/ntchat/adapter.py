@@ -11,6 +11,7 @@ from nonebot.drivers.fastapi import Driver
 from nonebot.exception import WebSocketClosed
 from nonebot.internal.driver import (
     URL,
+    HTTPServerSetup,
     Request,
     Response,
     WebSocket,
@@ -38,7 +39,7 @@ class Adapter(BaseAdapter):
     _result_store = ResultStore()
     """api回调存储"""
 
-    def __init__(self, driver: Driver, **kwargs):
+    def __init__(self, driver: Driver, **kwargs) -> None:
         super().__init__(driver, **kwargs)
         self.ntchat_config: Config = Config(**self.config.dict())
         self.connections: Dict[str, WebSocket] = {}
@@ -46,7 +47,7 @@ class Adapter(BaseAdapter):
         self._search_events()
         self._setup()
 
-    def _search_events(self):
+    def _search_events(self) -> None:
         """搜索事件模型"""
         for model_name in dir(event):
             model = getattr(event, model_name)
@@ -55,6 +56,19 @@ class Adapter(BaseAdapter):
             event_models.add_event_model(model)
 
     def _setup(self) -> None:
+        http_setup = HTTPServerSetup(
+            URL("/ntchat/"), "POST", self.get_name(), self._handle_http
+        )
+        self.setup_http_server(http_setup)
+        http_setup = HTTPServerSetup(
+            URL("/ntchat/http"), "POST", self.get_name(), self._handle_http
+        )
+        self.setup_http_server(http_setup)
+        http_setup = HTTPServerSetup(
+            URL("/ntchat/http/"), "POST", self.get_name(), self._handle_http
+        )
+        self.setup_http_server(http_setup)
+
         ws_setup = WebSocketServerSetup(
             URL("/ntchat/"), self.get_name(), self._handle_ws
         )
@@ -92,13 +106,40 @@ class Adapter(BaseAdapter):
                 await self._result_store.fetch(bot.self_id, seq, timeout)
             )
 
+    async def _handle_http(self, request: Request) -> Response:
+        self_id = request.headers.get("X-Self-ID")
+
+        # check self_id
+        if not self_id:
+            log("WARNING", "Missing X-Self-ID Header")
+            return Response(400, content="Missing X-Self-ID Header")
+
+        # check access_token
+        response = self._check_access_token(request)
+        if response is not None:
+            return response
+
+        data = request.content
+        if data is not None:
+            json_data = json.loads(data)
+            event = self.json_to_event(json_data)
+            if event:
+                bot = self.bots.get(self_id, None)
+                if not bot:
+                    bot = Bot(self, self_id)
+                    self.bot_connect(bot)
+                    log("INFO", f"<y>Bot {escape_tag(self_id)}</y> connected")
+                bot = cast(Bot, bot)
+                asyncio.create_task(bot.handle_event(event))
+        return Response(204)
+
     async def _handle_ws(self, websocket: WebSocket) -> None:
         self_id = websocket.request.headers.get("X-Self-ID")
 
         # check self_id
         if not self_id:
-            log("WARNING", "缺少身份标识头")
-            await websocket.close(1008, "缺少身份标识头")
+            log("WARNING", "Missing X-Self-ID Header")
+            await websocket.close(1008, "Missing X-Self-ID Header")
             return
         elif self_id in self.bots:
             log("WARNING", f"There's already a bot {self_id}, ignored")
