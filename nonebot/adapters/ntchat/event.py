@@ -239,8 +239,6 @@ class SystemMessageEvent(Event):
     """接收者的wxid"""
     msgid: str
     """消息id"""
-    message: Message
-    """消息message对象"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -353,9 +351,9 @@ class RevokeMessageEvent(NoticeEvent):
     def get_event_description(self) -> str:
         msg = "[撤回通知]请查看raw_msg"
         if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
+            return f"Message  from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
-            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
+            return f"Message  from {self.from_wxid}: {msg}"
 
 
 class Sex(IntEnum):
