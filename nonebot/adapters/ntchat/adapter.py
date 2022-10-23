@@ -8,9 +8,10 @@ import json
 from typing import Any, Dict, List, Optional, cast
 
 from nonebot.drivers.fastapi import Driver
-from nonebot.exception import WebSocketClosed
+from nonebot.exception import ApiNotAvailable, NetworkError, WebSocketClosed
 from nonebot.internal.driver import (
     URL,
+    ForwardDriver,
     HTTPServerSetup,
     Request,
     Response,
@@ -105,6 +106,41 @@ class Adapter(BaseAdapter):
             return handle_api_result(
                 await self._result_store.fetch(bot.self_id, seq, timeout)
             )
+        elif isinstance(self.driver, ForwardDriver):
+            api_root = self.ntchat_config.http_api_root
+            if not api_root:
+                raise ApiNotAvailable
+            elif not api_root.endswith("/"):
+                api_root += "/"
+
+            headers = {"Content-Type": "application/json"}
+
+            request = Request(
+                "POST",
+                api_root + api,
+                headers=headers,
+                timeout=timeout,
+                content=json.dumps(data, cls=DataclassEncoder),
+            )
+
+            try:
+                response = await self.driver.request(request)
+
+                if 200 <= response.status_code < 300:
+                    if not response.content:
+                        raise ValueError("Empty response")
+                    result = json.loads(response.content)
+                    return handle_api_result(result)
+                raise NetworkError(
+                    f"HTTP request received unexpected "
+                    f"status code: {response.status_code}"
+                )
+            except NetworkError:
+                raise
+            except Exception as e:
+                raise NetworkError("HTTP request failed") from e
+        else:
+            raise ApiNotAvailable
 
     async def _handle_http(self, request: Request) -> Response:
         self_id = request.headers.get("X-Self-ID")

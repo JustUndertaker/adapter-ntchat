@@ -4,15 +4,16 @@
 from typing import Optional
 
 from nonebot.exception import AdapterException
+from nonebot.exception import ApiNotAvailable as BaseApiNotAvailable
 from nonebot.exception import NetworkError as BaseNetworkError
 
 
-class OneBotAdapterException(AdapterException):
+class NtchatAdapterException(AdapterException):
     def __init__(self) -> None:
         super().__init__("ntchat")
 
 
-class NotInteractableEventError(OneBotAdapterException):
+class NotInteractableEventError(NtchatAdapterException):
     """非可交互事件错误"""
 
     def __init__(self, msg: Optional[str] = None) -> None:
@@ -27,7 +28,7 @@ class NotInteractableEventError(OneBotAdapterException):
         return self.__repr__()
 
 
-class NetworkError(BaseNetworkError, OneBotAdapterException):
+class NetworkError(BaseNetworkError, NtchatAdapterException):
     """网络错误。"""
 
     def __init__(self, msg: Optional[str] = None) -> None:
@@ -40,3 +41,7 @@ class NetworkError(BaseNetworkError, OneBotAdapterException):
 
     def __str__(self) -> str:
         return self.__repr__()
+
+
+class ApiNotAvailable(BaseApiNotAvailable, NtchatAdapterException):
+    """API 连接不可用"""

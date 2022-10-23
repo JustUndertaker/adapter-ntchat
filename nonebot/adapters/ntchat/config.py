@@ -14,6 +14,8 @@ class Config(BaseModel):
 
     access_token: Optional[str] = Field(default=None)
     """令牌口令"""
+    http_api_root: Optional[str] = Field(default=None)
+    """http api请求地址"""
 
     class Config:
         extra = "ignore"
