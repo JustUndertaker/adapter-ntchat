@@ -332,7 +332,7 @@ class NoticeEvent(Event):
         return "notice"
 
 
-class RevokeMessageEvent(NoticeEvent):
+class RevokeNoticeEvent(NoticeEvent):
     """接收撤回消息"""
 
     type: int = EventType.MT_RECV_REVOKE_MSG
@@ -461,7 +461,7 @@ class AppEvent(Event):
             sub_type = SubType(self.wx_sub_type).name
         except Exception:
             sub_type = self.wx_sub_type
-        return f"Message.{wx_type}.{sub_type}"
+        return f"AppMessage.{wx_type}.{sub_type}"
 
 
 class LinkMessageEvent(AppEvent):
