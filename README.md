@@ -1,7 +1,7 @@
 <h1 align="center">Nonebot Adapter Ntchat</h1>
 
 <p align="center">
-    <a href="https://github.com/JustUndertaker/ntchat-client/releases"><img src="https://img.shields.io/badge/release-0.3.1-blue.svg?" alt="release"></a>
+    <a href="https://github.com/JustUndertaker/ntchat-client/releases"><img src="https://img.shields.io/badge/release-0.3.2-blue.svg?" alt="release"></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?" alt="License"></a>
 </p>
 
@@ -33,6 +33,31 @@ git clone https://github.com/JustUndertaker/adapter-ntchat.git
 - [ ] ~~正向ws~~
 
 其他的感觉用处不大就...
+
+## 配置内容
+
+```dotenv
+access_token = ""
+```
+
+可不填，如填写需要与 ntchat-lient 一致。
+
+### 使用反向ws：
+
+默认配置使用反向ws，无需调整
+
+### 使用http post
+
+需要将driver类型设置为：ForwardDriver，同时配置http api地址。
+
+设置方法：[文档](https://v2.nonebot.dev/docs/next/tutorial/choose-driver)
+
+示例：
+
+``` dotenv
+DRIVER=~httpx
+ntchat_http_api_root="http://127.0.0.1:8000"
+```
 
 ## 注意事项
 
