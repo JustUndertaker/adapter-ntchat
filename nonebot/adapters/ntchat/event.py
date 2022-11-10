@@ -377,6 +377,15 @@ class RevokeNoticeEvent(NoticeEvent):
     """接收者的wxid"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
+    msg_id: str
+    """撤回消息id"""
+
+    @root_validator(pre=True, allow_reuse=True)
+    def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        raw_xml = values["raw_msg"]
+        xml_obj = ET.fromstring(raw_xml)
+        values["msg_id"] = xml_obj.findall("./revokemsg/newmsgid")[0].text
+        return values
 
     @overrides(NoticeEvent)
     def get_event_description(self) -> str:
