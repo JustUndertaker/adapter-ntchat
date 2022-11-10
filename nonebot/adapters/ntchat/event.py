@@ -1,6 +1,7 @@
 from copy import deepcopy
 from enum import IntEnum
 from typing import Any, Dict, List
+from xml.etree import ElementTree as ET
 
 from nonebot.typing import overrides
 from nonebot.utils import escape_tag
@@ -121,6 +122,38 @@ class TextMessageEvent(MessageEvent):
             return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {escape_tag(self.msg)}"
         else:
             return f"Message {self.msgid} from {self.from_wxid}: {escape_tag(self.msg)}"
+
+
+class QuoteMessageEvent(MessageEvent):
+    """
+    引用消息事件，注意此事件原则上属于app事件，但为了方便改为了Message事件
+    """
+
+    type: int = EventType.MT_RECV_OTHER_APP_MSG
+    wx_sub_type: int = SubType.WX_APPMSG_QUOTE
+    """消息子类型"""
+    raw_msg: str
+    """微信中的原始消息,xml格式"""
+    message: Message
+    """消息主体"""
+    quote_message_id: str
+    """被引用消息id"""
+    quote_uer_id: str
+    """被引用用户id"""
+
+    @root_validator(pre=True, allow_reuse=True)
+    def get_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        raw_xml = values["raw_msg"]
+        xml_obj = ET.fromstring(raw_xml)
+        values["message"] = xml_obj.findall("./msg/appmsg/tittle")[0].text
+        refermsg = xml_obj.findall("./msg/appmsg/refermsg")[0]
+        values["quote_message_id"] = refermsg.findall("./svrid")[0].text
+        values["quote_uer_id"] = refermsg.findall("./chatusr")[0].text
+        return values
+
+    @overrides(MessageEvent)
+    def get_event_description(self) -> str:
+        return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {self.message}"
 
 
 class PictureMessageEvent(MessageEvent):
