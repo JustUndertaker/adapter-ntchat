@@ -389,7 +389,7 @@ class RevokeNoticeEvent(NoticeEvent):
 
     @overrides(NoticeEvent)
     def get_event_description(self) -> str:
-        msg = "[撤回通知]请查看raw_msg"
+        msg = f"[撤回通知]msg_id:{self.msg_id}"
         if self.room_wxid:
             return f"Message  from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
