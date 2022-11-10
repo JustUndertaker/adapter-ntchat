@@ -134,19 +134,17 @@ class QuoteMessageEvent(MessageEvent):
     """消息子类型"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
-    message: Message
-    """消息主体"""
     quote_message_id: str
     """被引用消息id"""
     quote_uer_id: str
     """被引用用户id"""
 
     @root_validator(pre=True, allow_reuse=True)
-    def get_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         raw_xml = values["raw_msg"]
         xml_obj = ET.fromstring(raw_xml)
-        values["message"] = xml_obj.findall("./msg/appmsg/tittle")[0].text
-        refermsg = xml_obj.findall("./msg/appmsg/refermsg")[0]
+        values["message"] = xml_obj.findall("./appmsg/title")[0].text
+        refermsg = xml_obj.findall("./appmsg/refermsg")[0]
         values["quote_message_id"] = refermsg.findall("./svrid")[0].text
         values["quote_uer_id"] = refermsg.findall("./chatusr")[0].text
         return values
