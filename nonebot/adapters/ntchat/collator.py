@@ -29,4 +29,6 @@ class EventModels(Generic[E]):
         event_type: int = data.get("type")
         sub_type = data.get("wx_sub_type", 0)
         event_model = self.event_dict.get((event_type, sub_type), None)
+        if event_model is None and sub_type != 0:
+            event_model = self.event_dict.get((event_type, 0))
         return event_model if event_model else Event

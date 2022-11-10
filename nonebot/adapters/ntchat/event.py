@@ -480,8 +480,6 @@ class AppEvent(Event):
     """接收者的wxid"""
     msgid: str
     """消息id"""
-    wx_sub_type: int
-    """消息子类型"""
 
     @overrides(Event)
     def get_type(self) -> str:
@@ -501,6 +499,7 @@ class LinkMessageEvent(AppEvent):
     """接收链接消息"""
 
     type: int = EventType.MT_RECV_LINK_MSG
+    wx_sub_type: int = SubType.WX_APPMSG_LINK
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -517,6 +516,7 @@ class FileMessageEvent(AppEvent):
     """接收文件消息"""
 
     type: int = EventType.MT_RECV_FILE_MSG
+    wx_sub_type: int = SubType.WX_APPMSG_FILE
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -533,6 +533,7 @@ class MiniAppMessageEvent(AppEvent):
     """接收小程序消息"""
 
     type: int = EventType.MT_RECV_MINIAPP_MSG
+    wx_sub_type: int = SubType.WX_APPMSG_MINIAPP
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -549,6 +550,7 @@ class WcpayMessageEvent(AppEvent):
     """接收转帐消息"""
 
     type: int = EventType.MT_RECV_WCPAY_MSG
+    wx_sub_type: int = SubType.WX_APPMSG_WCPAY
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
