@@ -27,7 +27,7 @@ class EventModels(Generic[E]):
     def get_event_model(self, data: Dict) -> Type[E]:
         """获取事件模型"""
         event_type: int = data.get("type")
-        sub_type = data.get("wx_sub_type", 0)
+        sub_type = data["data"].get("wx_sub_type", 0)
         event_model = self.event_dict.get((event_type, sub_type), None)
         if event_model is None and sub_type != 0:
             event_model = self.event_dict.get((event_type, 0))
