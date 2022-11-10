@@ -338,7 +338,7 @@ class RequestEvent(Event):
 
     @overrides(Event)
     def get_type(self) -> str:
-        return "message"
+        return "request"
 
 
 class FriendAddRequestEvent(RequestEvent):
