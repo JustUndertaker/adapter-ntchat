@@ -107,7 +107,7 @@ class Adapter(BaseAdapter):
                 await self._result_store.fetch(bot.self_id, seq, timeout)
             )
         elif isinstance(self.driver, ForwardDriver):
-            api_root = self.ntchat_config.http_api_root
+            api_root = self.ntchat_config.ntchat_http_api_root
             if not api_root:
                 raise ApiNotAvailable
             elif not api_root.endswith("/"):
