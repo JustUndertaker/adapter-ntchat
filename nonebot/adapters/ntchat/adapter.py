@@ -39,6 +39,8 @@ class Adapter(BaseAdapter):
 
     _result_store = ResultStore()
     """api回调存储"""
+    ntchat_config: Config
+    """ntchat配置"""
 
     def __init__(self, driver: Driver, **kwargs) -> None:
         super().__init__(driver, **kwargs)
