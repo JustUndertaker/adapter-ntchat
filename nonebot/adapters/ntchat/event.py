@@ -103,6 +103,10 @@ class MessageEvent(Event):
         return "message"
 
     @overrides(Event)
+    def get_user_id(self) -> str:
+        return self.from_wxid
+
+    @overrides(Event)
     def get_message(self) -> "Message":
         return self.message
 
@@ -278,6 +282,10 @@ class SystemMessageEvent(Event):
         return "system"
 
     @overrides(Event)
+    def get_user_id(self) -> str:
+        return self.from_wxid
+
+    @overrides(Event)
     def get_event_description(self) -> str:
         msg = "[系统消息]请查看raw_msg"
         if self.room_wxid:
@@ -310,6 +318,10 @@ class OtherMessageEvent(Event):
         return "other"
 
     @overrides(Event)
+    def get_user_id(self) -> str:
+        return self.from_wxid
+
+    @overrides(Event)
     def get_event_description(self) -> str:
         msg = "[其他未知消息]请查看对应type和raw_msg"
         if self.room_wxid:
@@ -337,6 +349,10 @@ class RequestEvent(Event):
     @overrides(Event)
     def get_type(self) -> str:
         return "request"
+
+    @overrides(Event)
+    def get_user_id(self) -> str:
+        return self.from_wxid
 
 
 class FriendAddRequestEvent(RequestEvent):
@@ -379,6 +395,10 @@ class RevokeNoticeEvent(NoticeEvent):
     """微信中的原始消息,xml格式"""
     msg_id: str
     """撤回消息id"""
+
+    @overrides(NoticeEvent)
+    def get_user_id(self) -> str:
+        return self.from_wxid
 
     @root_validator(pre=True, allow_reuse=True)
     def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
@@ -491,6 +511,10 @@ class AppEvent(Event):
     @overrides(Event)
     def get_type(self) -> str:
         return "app"
+
+    @overrides(Event)
+    def get_user_id(self) -> str:
+        return self.from_wxid
 
     @overrides(Event)
     def get_event_name(self) -> str:
