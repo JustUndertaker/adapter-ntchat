@@ -343,7 +343,7 @@ class Bot(BaseBot):
             * `room_wxid`：群id
         """
         ...
-    async def modify_friend_remark(self, wxid: str, remark: str):
+    async def modify_friend_remark(self, *, wxid: str, remark: str):
         """
         说明:
             修改好友备注
@@ -351,5 +351,14 @@ class Bot(BaseBot):
         参数:
             * `wxid`：好友id
             * `remark`：修改后的备注
+        """
+        ...
+    async def get_room_name(self, *, room_wxid: str) -> str:
+        """
+        说明:
+            获取群名
+
+        参数:
+            * `room_wxid`：群聊id
         """
         ...
