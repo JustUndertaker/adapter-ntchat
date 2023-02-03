@@ -280,7 +280,7 @@ class LocationMessageEvent(MessageEvent):
     """位置x坐标"""
     location_y: str
     """位置y坐标"""
-    lable: str
+    label: str
     """位置标签"""
     poiname: str
     """位置名称"""
@@ -294,7 +294,7 @@ class LocationMessageEvent(MessageEvent):
         location = xml_obj.find("./location")
         values["location_x"] = location.attrib.get("x")
         values["location_y"] = location.attrib.get("y")
-        values["lable"] = location.attrib.get("lable")
+        values["label"] = location.attrib.get("label")
         values["poiname"] = location.attrib.get("poiname")
         return values
 
