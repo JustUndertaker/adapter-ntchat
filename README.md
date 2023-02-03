@@ -1,9 +1,10 @@
 <h1 align="center">Nonebot Adapter Ntchat</h1>
 
 <p align="center">
-    <a href="https://github.com/JustUndertaker/ntchat-client/releases"><img src="https://img.shields.io/badge/release-0.3.4-blue.svg?" alt="release"></a>
+    <a href="https://github.com/JustUndertaker/adapter-ntchat/releases"><img src="https://img.shields.io/badge/release-0.3.5-blue.svg?" alt="release"></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?" alt="License"></a>
 </p>
+
 
 
 ## 简介
