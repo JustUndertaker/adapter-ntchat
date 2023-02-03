@@ -226,7 +226,7 @@ class CardMessageEvent(MessageEvent):
             return f"Message {self.msgid} from {self.from_wxid}: {msg}"
 
 
-class ViedeoMessageEvent(MessageEvent):
+class VideoMessageEvent(MessageEvent):
     """接收视频消息"""
 
     type: int = EventType.MT_RECV_VIDEO_MSG
@@ -301,6 +301,33 @@ class LocationMessageEvent(MessageEvent):
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
         msg = f"[位置消息] - {self.poiname}"
+        if self.room_wxid:
+            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
+        else:
+            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
+
+
+class FileMessageEvent(MessageEvent):
+    """接收文件消息"""
+
+    type: int = EventType.MT_RECV_FILE_MSG
+    wx_sub_type: int = SubType.WX_APPMSG_FILE
+    file: str
+    """接收文件路径"""
+    file_name: str
+    """接收文件名称"""
+    raw_msg: str
+    """微信中的原始消息,xml格式"""
+
+    @root_validator(pre=True, allow_reuse=True)
+    def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        file = Path(values["file"])
+        values["file_name"] = file.name
+        return values
+
+    @overrides(Event)
+    def get_event_description(self) -> str:
+        msg = f"[接收文件事件] - {self.file_name}"
         if self.room_wxid:
             return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
@@ -586,33 +613,6 @@ class LinkMessageEvent(AppEvent):
     @overrides(Event)
     def get_event_description(self) -> str:
         msg = "[小程序链接事件]请查看raw_msg"
-        if self.room_wxid:
-            return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
-        else:
-            return f"Message {self.msgid} from {self.from_wxid}: {msg}"
-
-
-class FileMessageEvent(AppEvent):
-    """接收文件消息"""
-
-    type: int = EventType.MT_RECV_FILE_MSG
-    wx_sub_type: int = SubType.WX_APPMSG_FILE
-    file: str
-    """接收文件路径"""
-    file_name: str
-    """接收文件名称"""
-    raw_msg: str
-    """微信中的原始消息,xml格式"""
-
-    @root_validator(pre=True, allow_reuse=True)
-    def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        file = Path(values["file"])
-        values["file_name"] = file.name
-        return values
-
-    @overrides(Event)
-    def get_event_description(self) -> str:
-        msg = f"[接收文件事件] - {self.file_name}"
         if self.room_wxid:
             return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
