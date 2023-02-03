@@ -1,6 +1,7 @@
 from copy import deepcopy
 from enum import IntEnum
 from typing import Any, Dict, List
+from urllib.parse import unquote
 from xml.etree import ElementTree as ET
 
 from nonebot.typing import overrides
@@ -147,10 +148,10 @@ class QuoteMessageEvent(MessageEvent):
     def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         raw_xml = values["raw_msg"]
         xml_obj = ET.fromstring(raw_xml)
-        values["message"] = xml_obj.findall("./appmsg/title")[0].text
-        refermsg = xml_obj.findall("./appmsg/refermsg")[0]
-        values["quote_message_id"] = refermsg.findall("./svrid")[0].text
-        values["quote_uer_id"] = refermsg.findall("./chatusr")[0].text
+        values["message"] = xml_obj.find("./appmsg/title").text
+        refermsg = xml_obj.find("./appmsg/refermsg")
+        values["quote_message_id"] = refermsg.find("./svrid").text
+        values["quote_uer_id"] = refermsg.find("./chatusr").text
         return values
 
     @overrides(MessageEvent)
@@ -230,8 +231,18 @@ class EmojiMessageEvent(MessageEvent):
     """接收表情消息"""
 
     type = EventType.MT_RECV_EMOJI_MSG
+    emoji_url: str
+    """表情url地址"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
+
+    @root_validator(pre=True, allow_reuse=True)
+    def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        raw_xml = values["raw_msg"]
+        xml_obj = ET.fromstring(raw_xml)
+        emoji_url = xml_obj.find("./emoji").attrib.get("cdnurl")
+        values["emoji_url"] = unquote(emoji_url)
+        return values
 
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
