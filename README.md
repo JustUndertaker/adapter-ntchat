@@ -67,29 +67,41 @@ ntchat_http_api_root="http://127.0.0.1:8000"
 
 ## 已实现事件
 
-### 普通事件
+### 消息事件
 
-- **TextMessageEvent**：文本消息，事件`type`为："message"，可用于触发on_message等
-- **FriendRquestEvent**：好友请求消息，事件`type`为："request"，可触发on_request
-- **RevokeMessageEvent**：撤回消息通知，事件`type`为："notice"，可触发on_notice
+消息事件可以使用`on_message`、`on_regex`、`on_keyword`等检测命令的方式触发，但是部分消息如`图片消息`没有文本返回，所有message内容为空字符串，但是可以用`on_message`捕获该事件，如果想单独监听某类事件，可以在`matcher.handle()`内的`event`参数单独注入事件类型，比如：`event: PictureMessageEvent`来处理图片事件
 
-- **PictureMessageEvent**：图片消息，事件`type`为："WX_MSG_PICTURE"
-- **VoiceMessageEvent**：语音消息，事件`type`为："WX_MSG_VOICE"
-- **CardMessageEvent**：名片消息，事件`type`为："WX_MSG_CARD"
-- **ViedeoMessageEvent**：视频消息，事件`type`为："WX_MSG_VIDEO"
-- **EmojiMessageEvent**：表情消息，事件`type`为："WX_MSG_EMOJI"
-- **LocationMessageEvent**：位置消息，事件`type`为："WX_MSG_LOCATION"
-- **SystemMessageEvent**：系统消息，事件`type`为："WX_MSG_SYSTEM"
-- **OtherMessageEvent**：其他消息，事件`type`未知
+- **TextMessageEvent**：文本消息事件
+- **QuoteMessageEvent**：引用回复消息事件
+- **PictureMessageEvent**：图片消息事件
+- **VoiceMessageEvent**：语音消息事件
+- **CardMessageEvent**：名片消息事件
+- **VideoMessageEvent**：视频消息事件
+- **EmojiMessageEvent**：表情消息事件
+- **LocationMessageEvent**：位置消息事件
+- **FileMessageEvent**：文件消息事件
+
+### 请求事件
+
+请求事件可以使用`on_request`进行捕获
+
+- **FriendAddRequestEvent**：添加好友请求事件
+
+### 通知事件
+
+通知事件可以使用`on_notice`进行捕获
+
+- **RevokeNoticeEvent**：撤回消息事件
+- **FriendAddNoticeEvent**：添加好友通知事件
+- **InvitedRoomEvent**：被邀请入群通知事件
 
 ### APP事件
 
-事件type为：app
+APP事件，事件type是`app`，可以通过`on("app")`来监听此类事件
 
-- **LinkMessageEvent**：链接消息，字段`wx_sub_type`为："WX_APPMSG_LINK"
-- **FileMessageEvent**：文件消息，字段`wx_sub_type`为："WX_APPMSG_FILE"
-- **MiniAppMessageEvent**：小程序消息，字段`wx_sub_type`为："WX_APPMSG_MINIAPP"
-- **WcpayMessageEvent**：转账消息，字段`wx_sub_type`为："WX_APPMSG_WCPAY"
+- **LinkMessageEvent**：链接消息事件
+- **MiniAppMessageEvent**：小程序消息事件
+- **WcpayMessageEvent**：转账消息事件
 - **OtherAppMessageEvent**：其他应用消息，字段`wx_sub_type`未知
 
 ### 监听事件
@@ -98,16 +110,16 @@ ntchat_http_api_root="http://127.0.0.1:8000"
 
 ```python
 from nonebot.plugin import on
-from nonebot.adapter.ntchat import PictureMessageEvent
+from nonebot.adapter.ntchat import WcpayMessageEvent
 
-matcher = on("WX_MSG_PICTURE") # rule,permission等参数同样可以加入
+matcher = on("app") # rule,permission等参数同样可以加入
 
 @matcher.handle()
-async def _(event:PictureMessageEvent):
+async def _(event:WcpayMessageEvent):
     pass
 ```
 
-上述例子会监听所有的图片消息事件。
+上述例子会监听所有的转账事件。
 
 ### 发送图片
 

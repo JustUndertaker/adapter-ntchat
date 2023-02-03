@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="nonebot-adapter-ntchat",
-    version="0.3.4",
+    version="0.3.5",
     author="JustUndertaker",
     author_email="806792561@qq.com",
     description="a wechat adapter for nonebot2",
