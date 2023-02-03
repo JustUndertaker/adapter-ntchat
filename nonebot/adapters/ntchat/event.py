@@ -1,5 +1,6 @@
 from copy import deepcopy
 from enum import IntEnum
+from pathlib import Path
 from typing import Any, Dict, List
 from urllib.parse import unquote
 from xml.etree import ElementTree as ET
@@ -218,7 +219,7 @@ class CardMessageEvent(MessageEvent):
 
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
-        msg = "[名片消息]请查看raw_msg"
+        msg = f"[名片消息] - {self.nickname}"
         if self.room_wxid:
             return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
@@ -299,7 +300,7 @@ class LocationMessageEvent(MessageEvent):
 
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
-        msg = "[位置消息]请查看raw_msg"
+        msg = f"[位置消息] - {self.poiname}"
         if self.room_wxid:
             return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
@@ -596,12 +597,22 @@ class FileMessageEvent(AppEvent):
 
     type: int = EventType.MT_RECV_FILE_MSG
     wx_sub_type: int = SubType.WX_APPMSG_FILE
+    file: str
+    """接收文件路径"""
+    file_name: str
+    """接收文件名称"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
+    @root_validator(pre=True, allow_reuse=True)
+    def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        file = Path(values["file"])
+        values["file_name"] = file.name
+        return values
+
     @overrides(Event)
     def get_event_description(self) -> str:
-        msg = "[接收文件事件]请查看raw_msg"
+        msg = f"[接收文件事件] - {self.file_name}"
         if self.room_wxid:
             return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
@@ -630,12 +641,25 @@ class WcpayMessageEvent(AppEvent):
 
     type: int = EventType.MT_RECV_WCPAY_MSG
     wx_sub_type: int = SubType.WX_APPMSG_WCPAY
+    feedesc: str
+    """收钱数目，以￥开头"""
+    pay_memo: str
+    """转账说明"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
+    @root_validator(pre=True, allow_reuse=True)
+    def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        raw_xml = values["raw_msg"]
+        xml_obj = ET.fromstring(raw_xml)
+        wcpayinfo = xml_obj.find("./appmsg/wcpayinfo")
+        values["feedesc"] = wcpayinfo.find("./feedesc").text
+        values["pay_memo"] = wcpayinfo.find("./pay_memo").text
+        return values
+
     @overrides(Event)
     def get_event_description(self) -> str:
-        msg = "[转账消息]请查看raw_msg"
+        msg = f"[转账消息] - 收到{self.feedesc}，转账说明：{self.pay_memo}"
         if self.room_wxid:
             return f"Message {self.msgid} from {self.from_wxid}@[群:{self.room_wxid}]: {msg}"
         else:
