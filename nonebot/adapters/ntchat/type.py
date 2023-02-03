@@ -45,7 +45,7 @@ class EventType(IntEnum):
     MT_RECV_PICTURE_MSG = 11047
     """接收图片消息"""
     MT_RECV_VOICE_MSG = 11048
-    """接收视频消息"""
+    """接收语音消息"""
     MT_RECV_FRIEND_MSG = 11049
     """接收申请好友消息"""
     MT_RECV_CARD_MSG = 11050

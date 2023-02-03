@@ -183,6 +183,8 @@ class VoiceMessageEvent(MessageEvent):
     """接收语音消息"""
 
     type: int = EventType.MT_RECV_VOICE_MSG
+    mp3_file: str
+    """语音消息文件"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -199,8 +201,20 @@ class CardMessageEvent(MessageEvent):
     """接收名片消息"""
 
     type: int = EventType.MT_RECV_CARD_MSG
+    headimg_url: str
+    """头像url"""
+    nickname: str
+    """名片用户昵称"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
+
+    @root_validator(pre=True, allow_reuse=True)
+    def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        raw_xml = values["raw_msg"]
+        xml_obj = ET.fromstring(raw_xml)
+        values["headimg_url"] = xml_obj.attrib.get("bigheadimgurl")
+        values["nickname"] = xml_obj.attrib.get("nickname")
+        return values
 
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
@@ -215,6 +229,10 @@ class ViedeoMessageEvent(MessageEvent):
     """接收视频消息"""
 
     type: int = EventType.MT_RECV_VIDEO_MSG
+    video: str
+    "接收视频路径"
+    video_thumb: str
+    "视频缩略图路径"
     raw_msg: str
     """微信中的原始消息,xml格式"""
 
@@ -257,8 +275,27 @@ class LocationMessageEvent(MessageEvent):
     """接收位置消息消息"""
 
     type: int = EventType.MT_RECV_LOCATION_MSG
+    location_x: str
+    """位置x坐标"""
+    location_y: str
+    """位置y坐标"""
+    lable: str
+    """位置标签"""
+    poiname: str
+    """位置名称"""
     raw_msg: str
     """微信中的原始消息,xml格式"""
+
+    @root_validator(pre=True, allow_reuse=True)
+    def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        raw_xml = values["raw_msg"]
+        xml_obj = ET.fromstring(raw_xml)
+        location = xml_obj.find("./location")
+        values["location_x"] = location.attrib.get("x")
+        values["location_y"] = location.attrib.get("y")
+        values["lable"] = location.attrib.get("lable")
+        values["poiname"] = location.attrib.get("poiname")
+        return values
 
     @overrides(MessageEvent)
     def get_event_description(self) -> str:
@@ -415,7 +452,7 @@ class RevokeNoticeEvent(NoticeEvent):
     def get_pre_message(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         raw_xml = values["raw_msg"]
         xml_obj = ET.fromstring(raw_xml)
-        values["msg_id"] = xml_obj.findall("./revokemsg/newmsgid")[0].text
+        values["msg_id"] = xml_obj.find("./revokemsg/newmsgid").text
         return values
 
     @overrides(NoticeEvent)
