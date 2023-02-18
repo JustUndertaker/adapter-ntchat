@@ -544,6 +544,15 @@ class RoomMember(BaseModel):
     """成员wxid"""
 
 
+class RoomMemberDel(BaseModel):
+    """群成员删除模型"""
+    
+    nickname: str
+    """群内昵称"""
+    wxid: str
+    """成员wxid"""
+    
+
 class InvitedRoomEvent(NoticeEvent):
     """被邀请入群事件"""
 
@@ -567,6 +576,56 @@ class InvitedRoomEvent(NoticeEvent):
     def get_event_description(self) -> str:
         return f"[被邀请入群通知]：{self.dict()}"
 
+
+class RoomMemberAddNoticeEvent(NoticeEvent):
+    """接收群成员加入消息"""
+
+    type: int = EventType.MT_ROOM_ADD_MEMBER_NOTIFY_MSG
+    """消息原始类型"""
+    total_member: int
+    """群成员人数"""
+    room_wxid: str
+    """群聊的wxid"""
+    member_list: List[RoomMember]
+    """群成员变动的wxid 可用event.member_list[0].wxid获取"""
+    nickname: str
+    """群昵称"""
+    data: Dict
+    """微信中的原始消息,xml格式"""
+
+    @overrides(NoticeEvent)
+    def get_user_id(self) -> str:
+        return self.room_wxid
+
+    @overrides(NoticeEvent)
+    def get_event_description(self) -> str:
+        return f"[群成员加入消息通知]：{self.dict()}"
+    
+
+class RoomMemberDelNoticeEvent(NoticeEvent):
+    """接收群成员退出消息"""
+
+    type: int = EventType.MT_ROOM_DEL_MEMBER_NOTIFY_MSG
+    """消息原始类型"""
+    total_member: int
+    """群成员人数"""
+    room_wxid: str
+    """群聊的wxid"""
+    member_list: List[RoomMemberDel]
+    """群成员变动的wxid 可用event.member_list[0].wxid获取"""
+    nickname: str
+    """群昵称"""
+    data: Dict
+    """微信中的原始消息,xml格式"""
+
+    @overrides(NoticeEvent)
+    def get_user_id(self) -> str:
+        return self.room_wxid
+
+    @overrides(NoticeEvent)
+    def get_event_description(self) -> str:
+        return f"[群成员退出消息通知]：{self.dict()}"
+    
 
 class AppEvent(Event):
     """app事件"""
